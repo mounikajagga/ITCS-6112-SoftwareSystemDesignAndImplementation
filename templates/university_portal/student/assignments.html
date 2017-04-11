@@ -8,6 +8,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
+
 <body>
 <nav class="navbar navbar-default">
   <div class="container-fluid">
@@ -20,23 +21,68 @@
       <li><a href="#">About Us</a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
-      <li><a href="#"><span class="glyphicon glyphicon-user"></span> {{ username }} </a></li>
+      <li><a href="#"><span class="glyphicon glyphicon-user"></span> {{ session.username }} </a></li>
+        <li><a href="logout"><span class="glyphicon glyphicon-log-out"></span></a></li>
     </ul>
   </div>
 </nav>
-<body>
 
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-3"></div>
         <div class="col-sm-6">
-        <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo">Subject 1</button>
-            <div id="demo" class="collapse">
-            <ul>
-                <li>Assignment 1</li>
-                <li>Assignment 2</li>
-            </ul>
-            </div>
+        All Assignments
+        <table class="table">
+                <thead>
+                    <tr>
+                        <th>Assignment</th>
+                        <th>Grade</th>
+                     </tr>
+                </thead>
+                 <tbody>
+                 {% for key, value in assignments %}
+                     <tr>
+                         <td>{{session.assignments}}{{key}}</td> <td>{{ value }}</td>
+                     </tr>
+                 {% endfor %}
+                 </tbody>
+            </table>
+        Due Assignments
+        <table class="table">
+                <thead>
+                    <tr>
+                        <th>Assignment</th>
+                        <th>Date Submitted</th>
+                        <th>Grade</th>
+                     </tr>
+                </thead>
+                 <tbody>
+                 {% for aid, dos, g in submitted_assignments %}
+                     <tr>
+                         <td>{{aid}}</td> <td>{{ dos }}</td><td>{{ d }}</td>
+                     </tr>
+                 {% endfor %}
+                 </tbody>
+            </table>
+
+
+        Submitted Assignments
+        <table class="table">
+                <thead>
+                    <tr>
+                        <th>Assignment</th>
+                        <th>Date Submitted</th>
+                        <th>Grade</th>
+                     </tr>
+                </thead>
+                 <tbody>
+                 {% for aid, dos, g in submitted_assignments %}
+                     <tr>
+                         <td>{{aid}}</td> <td>{{ dos }}</td><td>{{ d }}</td>
+                     </tr>
+                 {% endfor %}
+                 </tbody>
+            </table>
         </div>
         <div class="col-sm-3"></div>
     </div>
