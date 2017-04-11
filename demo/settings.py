@@ -73,14 +73,26 @@ WSGI_APPLICATION = 'demo.wsgi.application'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.oracle',
+#         'NAME': 'localhost/XE',
+#         'USER': 'admin',
+#         'PASSWORD': 'admin',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.oracle',
-        'NAME': 'localhost/XE',
-        'USER': 'admin',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ssdi_project',
+        'USER': 'root',
         'PASSWORD': 'admin',
+        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        'PORT': '3306',
     }
 }
+
 
 # DATABASES = {
 #    'default': {
@@ -125,3 +137,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS =['/university_portal/static']

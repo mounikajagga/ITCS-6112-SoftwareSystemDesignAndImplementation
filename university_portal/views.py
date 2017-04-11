@@ -1,6 +1,12 @@
 from django.shortcuts import render
 import MySQLdb
 
+# Database connection parameters
+
+USER = 'root'
+PASSWORD = 'admin'
+HOST = '127.0.0.1'
+DATABASE = 'ssdi_project'
 
 # Create your views here.
 
@@ -16,7 +22,7 @@ def start(request):
 
 
 def login(request):
-    con = MySQLdb.connect(user='root', password='admin', host='127.0.0.1', database='ssdi_project')
+    con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = con.cursor()
     statement = "select pwd, email, typ from login where email=\'" + request.POST['username'] + "\'"
     cur.execute(statement)
@@ -33,6 +39,7 @@ def login(request):
                 return render(request, "university_portal/student/welcome.html", {"session": request.session})
             elif rs[2] == 'F':
                 return render(request, "university_portal/instructor/assignments.html", {"session": request.session})
+
     return render(request, "university_portal/login.html", {})
 
 
@@ -41,17 +48,27 @@ def logout(request):
     return render(request, "university_portal/login.html", {})
 
 
+def about_us(request):
+    return render(request, "university_portal/about_us.html", {"session": request.session})
+
+
+def contact_us(request):
+    return render(request, "university_portal/contact_us.html", {"session": request.session})
+
+
 def assignments(request):
     if 'username' not in request.session:
         return render(request, "university_portal/login.html", {})
 
-    assignments = get_all_assignments(request.GET['courseId'], request.session['student'][1])
-    submitted_assignments = get_submited_assignments(request.GET['courseId'], request.session['student'][1])
+    all_assignments = get_all_assignments(request.GET['courseId'], request.session['student'][1])
+    submitted_assignments = get_submitted_assignments(request.GET['courseId'], request.session['student'][1])
+    due_assignments = get_due_assignments(all_assignments, submitted_assignments)
 
     return render(request, "university_portal/student/assignments.html",
                   {"session": request.session,
-                   "assignments": assignments,
-                   "submitted_assignments": submitted_assignments})
+                   "all_assignments": all_assignments,
+                   "submitted_assignments": submitted_assignments,
+                   "due_assignments": due_assignments})
 
 
 # ------------------------------------
@@ -64,7 +81,7 @@ def assignments(request):
 
 
 def get_student(username):
-    con = MySQLdb.connect(user='root', password='admin', host='127.0.0.1', database='ssdi_project')
+    con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = con.cursor()
     statement = "SELECT sname, sid, stu_phone_number, semester, address, email FROM students WHERE email=\'" + username + "\'"
     cur.execute(statement)
@@ -74,7 +91,7 @@ def get_student(username):
 
 
 def get_courses(username):
-    con = MySQLdb.connect(user='root', password='admin', host='127.0.0.1', database='ssdi_project')
+    con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = con.cursor()
     statement = "SELECT c.cid, c.cname FROM students s, enroll e, courses c WHERE s.sid=e.sid and e.cid=c.cid and s.email=\'" + username + "\'"
     cur.execute(statement)
@@ -84,7 +101,7 @@ def get_courses(username):
 
 
 def get_all_assignments(courseid, sid):
-    con = MySQLdb.connect(user='root', password='admin', host='127.0.0.1', database='ssdi_project')
+    con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = con.cursor()
     statement = "SELECT aid, assignment_grades FROM assignments WHERE cid=\'" + courseid + "\' AND sid = \'" + sid + "\'"
     cur.execute(statement)
@@ -92,8 +109,9 @@ def get_all_assignments(courseid, sid):
     con.close()
     return all_assignments
 
-def get_submited_assignments(courseid, sid):
-    con = MySQLdb.connect(user='root', password='admin', host='127.0.0.1', database='ssdi_project')
+
+def get_submitted_assignments(courseid, sid):
+    con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = con.cursor()
     statement = "SELECT DISTINCT a.aid, s.date_of_submission, a.assignment_grades FROM assignments a, stu_submit s " \
                 "WHERE a.cid=\'" + courseid + "\' AND s.sid = \'" + sid + "\'"
@@ -102,3 +120,17 @@ def get_submited_assignments(courseid, sid):
     submitted_assignments = cur.fetchall()
     con.close()
     return submitted_assignments
+
+
+def get_due_assignments(all_assignments, submitted_assignments):
+    due_assignments = []
+
+    for all_aid, grade in all_assignments:
+        exist = False
+        for sub_aid, sub_date, sub_grade in submitted_assignments:
+            if all_aid == sub_aid:
+                exist = True
+                break
+        if not exist:
+            due_assignments.append(all_aid)
+    return due_assignments

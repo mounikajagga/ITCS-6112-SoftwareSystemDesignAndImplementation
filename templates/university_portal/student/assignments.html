@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>Login</title>
   <meta charset="utf-8">
@@ -10,83 +11,112 @@
 </head>
 
 <body>
-<nav class="navbar navbar-default">
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">University Portal</a>
+      </div>
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="home">Home</a></li>
+        <li><a href="contact_us">Contact Us</a></li>
+        <li><a href="about_us">About Us</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#"><span class="glyphicon glyphicon-user"></span> {{ session.student.0 }} </a></li>
+        <li><a href="logout"><span class="glyphicon glyphicon-log-out"></span> logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
   <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">University Portal</a>
-    </div>
-    <ul class="nav navbar-nav">
-      <li class="active"><a href="#">Home</a></li>
-      <li><a href="#">Contact Us</a></li>
-      <li><a href="#">About Us</a></li>
-    </ul>
-    <ul class="nav navbar-nav navbar-right">
-      <li><a href="#"><span class="glyphicon glyphicon-user"></span> {{ session.username }} </a></li>
-        <li><a href="logout"><span class="glyphicon glyphicon-log-out"></span></a></li>
-    </ul>
-  </div>
-</nav>
-
-<div class="container-fluid">
     <div class="row">
-        <div class="col-sm-3"></div>
-        <div class="col-sm-6">
-        All Assignments
-        <table class="table">
-                <thead>
-                    <tr>
-                        <th>Assignment</th>
-                        <th>Grade</th>
-                     </tr>
-                </thead>
-                 <tbody>
-                 {% for key, value in assignments %}
-                     <tr>
-                         <td>{{session.assignments}}{{key}}</td> <td>{{ value }}</td>
-                     </tr>
-                 {% endfor %}
-                 </tbody>
-            </table>
-        Due Assignments
-        <table class="table">
-                <thead>
-                    <tr>
-                        <th>Assignment</th>
-                        <th>Date Submitted</th>
-                        <th>Grade</th>
-                     </tr>
-                </thead>
-                 <tbody>
-                 {% for aid, dos, g in submitted_assignments %}
-                     <tr>
-                         <td>{{aid}}</td> <td>{{ dos }}</td><td>{{ d }}</td>
-                     </tr>
-                 {% endfor %}
-                 </tbody>
-            </table>
+      <div class="col-sm-3"></div>
+      <div class="col-sm-6">
+
+        <ul class="nav nav-tabs">
+          <li class="active"><a data-toggle="tab" href="#due">Due</a></li>
+          <li><a data-toggle="tab" href="#sub">Submitted</a></li>
+          <li><a data-toggle="tab" href="#all">All</a></li>
+        </ul>
 
 
-        Submitted Assignments
-        <table class="table">
+        <div class="tab-content">
+          <div id="due" class="tab-pane fade in active">
+            <h3>Due Assignments </h3>
+              {% if due_assignments %}
+              <table class="table">
                 <thead>
-                    <tr>
-                        <th>Assignment</th>
-                        <th>Date Submitted</th>
-                        <th>Grade</th>
-                     </tr>
+                  <tr>
+                    <th>Assignment</th>
+                    <th>Due date</th>
+                    <th></th>
+                  </tr>
                 </thead>
-                 <tbody>
-                 {% for aid, dos, g in submitted_assignments %}
-                     <tr>
-                         <td>{{aid}}</td> <td>{{ dos }}</td><td>{{ d }}</td>
-                     </tr>
-                 {% endfor %}
-                 </tbody>
-            </table>
+                <tbody>
+                  {% for aid in due_assignments %}
+                  <tr>
+                    <td>{{aid}}</td>
+                    <td>Date</td>
+                    <td>
+                        <form action="assignment_submit">
+                            Select file: <input type="file" name="assign_file"><input type="submit">
+                        </form>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              {% else %}
+                <p>No Due Assignments! Enjoy the day!</p>
+              {% endif %}
+          </div>
+
+          <div id="sub" class="tab-pane fade">
+            <h3>Submitted Assignments</h3>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Assignment</th>
+                    <th>Date Submitted</th>
+                    <th>Grade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for aid, dos, g in submitted_assignments %}
+                  <tr>
+                    <td>{{aid}}</td>
+                    <td>{{ dos }}</td>
+                    <td>{{ d }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+          </div>
+
+          <div id="all" class="tab-pane fade">
+            <h3>All Assignments</h3>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Assignment</th>
+                    <th>Grade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for key, value in all_assignments %}
+                  <tr>
+                    <td>{{key}}</td>
+                    <td>{{ value }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+          </div>
         </div>
-        <div class="col-sm-3"></div>
+      </div>
+      <div class="col-sm-3"></div>
     </div>
-</div>
-
+  </div>
 </body>
+
 </html>
