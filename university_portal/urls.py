@@ -11,6 +11,6 @@ urlpatterns = [
     url(r'^about_us', views.about_us, name="about_us"),
     url(r'^contact_us', views.contact_us, name="contact_us"),
 
-    # forms
+    # student forms
     url(r'^assignments', views.assignments, name='assignments'),
 ]

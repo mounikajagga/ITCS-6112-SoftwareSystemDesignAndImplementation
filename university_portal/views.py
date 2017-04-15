@@ -8,6 +8,7 @@ PASSWORD = 'admin'
 HOST = '127.0.0.1'
 DATABASE = 'ssdi_project'
 
+
 # Create your views here.
 
 
@@ -24,7 +25,7 @@ def start(request):
 def login(request):
     con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = con.cursor()
-    statement = "select pwd, email, typ from login where email=\'" + request.POST['username'] + "\'"
+    statement = "SELECT pwd, email, typ FROM login WHERE email=\'" + request.POST['username'] + "\'"
     cur.execute(statement)
     rs = cur.fetchone()
     con.close()
