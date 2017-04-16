@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Login</title>
+    <title>Assignment: {{ session.student.0 }}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -21,9 +21,14 @@
             <li><a href="contact_us">Contact Us</a></li>
             <li><a href="about_us">About Us</a></li>
         </ul>
-        <ul class="nav navbar-nav navbar-right">
-            <li><a href="#"><span class="glyphicon glyphicon-user"></span> {{ session.student.0 }} </a></li>
-            <li><a href="logout"><span class="glyphicon glyphicon-log-out"></span> logout</a></li>
+         <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <span class="glyphicon glyphicon-user"></span> {{ session.student.0 }} <span class="caret"/></a>
+                <ul class="dropdown-menu">
+                    <li><a href="/profile">Profile</a></li>
+                </ul>
+            </li>
+            <li><a href=" logout"><span class="glyphicon glyphicon-log-out"></span> logout</a></li>
         </ul>
     </div>
 </nav>
@@ -33,12 +38,11 @@
         <div class="col-sm-3"></div>
         <div class="col-sm-6">
 
-            <ul class="nav nav-tabs">
+            <ul class="nav nav-tabs nav-justified">
                 <li class="active"><a data-toggle="tab" href="#due">Due</a></li>
                 <li><a data-toggle="tab" href="#sub">Submitted</a></li>
                 <li><a data-toggle="tab" href="#all">All</a></li>
             </ul>
-
 
             <div class="tab-content">
                 <div id="due" class="tab-pane fade in active">
@@ -103,7 +107,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for key, value in all_assignments %}
+                        {% for key, value, grade in all_assignments %}
                             <tr>
                                 <td>{{ key }}</td>
                                 <td>{{ value }}</td>

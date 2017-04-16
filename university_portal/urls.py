@@ -11,6 +11,16 @@ urlpatterns = [
     url(r'^about_us', views.about_us, name="about_us"),
     url(r'^contact_us', views.contact_us, name="contact_us"),
 
-    # student forms
+    # common
+    url(r'^profile', views.profile, name="profile"),
+
+    # student
+    url(r'^assignments_stu', views.assignments_stu, name='assignments_stu'),
+
+    # faculty
     url(r'^assignments', views.assignments, name='assignments'),
+    url(r'^grades', views.grades, name='grades'),
+
+    url(r'.*', views.error, name='error')
+
 ]

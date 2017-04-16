@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>{{ session.faculty.1 }}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'Style.css' %}" />
+</head>
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand navbar-center" href="#">UNIVERSITY PORTAL</a>
+            </div>
+            <div class="nav navbar-nav">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Home</a></li>
+                    <li><a href="#">Students</a></li>
+                    <li><a href="#">Faculties</a></li>
+                </ul>
+            </div>
+            <div>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#"><span class="glyphicon glyphicon-user">&nbsp{{session.faculty.1}}</span></a> </li>
+                    <li><a href="logout"><span class="glyphicon glyphicon-log-out"></span></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div>
+        <div class="col-sm-3"></div>
+        <div class="col-sm-6">
+            <text>Hi <strong><i><mark>{{ session.faculty.1 }}</mark></i></strong>!! HOW YOU ARE DOING TODAY </text>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Course ID</th>
+                        <th>Course Name</th>
+                        <th>Semester</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, value, sem in session.courses %}
+                        <tr>
+                            <td>
+                                <form action="assignments" method="GET">
+                                    <input type="submit" name="CourseID" class="btn btn-link" value="{{ key }}" />
+                                </form>
+                            </td>
+                    <td>{{ value }}</td>
+                    <td>{{ sem }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-3">
+            <img src="static/icon.jpg" class="img-circle" alt="{{ names.1 }}"  height="200" width="200"  />
+        </div>
+    </div>
+
+</body>

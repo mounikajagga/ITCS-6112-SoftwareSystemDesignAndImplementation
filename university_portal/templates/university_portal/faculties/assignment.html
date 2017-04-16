@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ faculties.1 }}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'Style.css' %}"/>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">UNIVERSITY PORTAL</a>
+        </div>
+
+        <div>
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">Home</a></li>
+                <li><a href="#">Students</a></li>
+                <li><a href="#">Faculties</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><span class="glyphicon glyphicon-user">&nbsp{{ faculties.1 }}</span></a></li>
+                <li><a href="logout"><span class="glyphicon glyphicon-log-out"></span></a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="col-sm-3"></div>
+<div class="col-sm-6">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#All">All</a></li>
+        <li><a data-toggle="tab" href="#Grades">Grading</a></li>
+    </ul>
+
+    <br>
+
+    <div class="tab-content">
+        <div id="All" class="tab-pane fade-in-active">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" href="#panel1">Assignments</a>
+                    </h4>
+                </div>
+            </div>
+
+            <div id="panel1" class="panel-collapse collapse in">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Assignments</th>
+                        <th>CourseID</th>
+                        <th>Course Name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for all in assignments %}
+                        <tr>
+                            <td>{{ all.0 }}</td>
+                            <td>{{ all.1 }}</td>
+                            <td>{{ all.2 }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" href="#panel2">Post Assignments</a>
+                    </h4>
+                </div>
+            </div>
+
+            <div id="panel2" class="panel-collapse collapse">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Assignments</th>
+                        <th>CourseID</th>
+                        <th>Course Name</th>
+                        <th>Deadline</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for all in assignments %}
+                        <form action="grades" method="get">
+                            <tr>
+
+                                <input type="hidden" name="CourseID" value="{{ all.1 }}"/>
+                                <td>{{ all.0 }}</td>
+                                <td>{{ all.1 }}</td>
+                                <td>{{ all.2 }}</td>
+                                <td><input type="date" name="Deadline" required="true" min={{ mindate }}/></td>
+                                {{ mindate }}
+                                <td>
+                                    <button type="submit" class="btn btn-xs btn-info">
+                                            <span class="glyphicon glyphicon-send" data-toggle="tooltip"
+                                                  title="Post"></span>&nbsp;
+                                        <input type="hidden" name="aid" value="{{ all.0 }}"/>
+                                    </button>
+                                </td>
+                            </tr>
+                        </form>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="Grades" class="tab-pane fade">
+
+            {% if deadline is empty %}
+                <h1>You have not posted anything</h1>
+            {% else %}
+                <h4>Hello !!!
+                    <mark><strong><i>{{ session.faculty.1 }}</i></strong></mark>
+                    Below are the details of your assignment:
+                </h4>
+
+                {% for all in assignments %}
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#Assignment{{ all.0 }}">Assignment - {{ all.0 }}</a>
+                            </h4>
+                        </div>
+                    </div>
+
+                    <div id="Assignment{{ all.0 }}" class="panel-collapse collapse">
+                        <table class="table table-striped">
+
+                            <thead>
+                            <tr>
+                                <th>Students</th>
+                                <th>Students ID</th>
+                                <th>Deadline</th>
+                                <th>Grade</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                {% for all in students %}
+                                    <td>
+                                        {{ all.0 }}
+                                    </td>
+                                    <td>
+                                        {{ all.1 }}
+                                    </td>
+                                    <td></td>
+                                    <form action="#" method="POST">
+                                        <td>
+                                            <select name="grade_assign">
+                                                <option value="assign">----</option>
+                                                <option value="assign">A</option>
+                                                <option value="assign">B</option>
+                                                <option value="assign">C</option>
+                                                <option value="assign">D</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button type="submit" class="btn-info btn-xs"><span
+                                                    class="glyphicon glyphicon-ok"></span></button>
+                                        </td>
+                                    </form>
+                                    </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <h3>{{ deadline.0 }}</h3>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

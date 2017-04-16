@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Welcome: {{ username }}</title>
+    <title>Welcome: {{ session.student.0 }} </title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -20,8 +20,14 @@
             <li><a href="about_us">About Us</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-            <li><a href="#"><span class="glyphicon glyphicon-user"></span> {{ session.student.0 }} </a></li>
-            <li><a href="logout"><span class="glyphicon glyphicon-log-out"></span> </a></li>
+            <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <span class="glyphicon glyphicon-user"></span> {{ session.student.0 }} <span class="caret"/></a>
+                <ul class="dropdown-menu">
+                    <li><a href="/profile">Profile</a></li>
+                    <li><a href="/update_password">Update Password</a></li>
+                </ul>
+            </li>
+            <li><a href=" logout"><span class="glyphicon glyphicon-log-out"></span> logout</a></li>
         </ul>
     </div>
 </nav>
@@ -29,9 +35,9 @@
     <div class="row">
         <div class="col-sm-3"></div>
         <div class="col-sm-6">
-            <h2>Hi {{ session.student.0 }}!</h2>
+            <h2>Hi, {{ session.student.0 }}!</h2>
             <h4>What are you up to today?</h4>
-            <br><br>
+            <br>
             <h5>Your Courses</h5>
 
             <table class="table">
@@ -45,7 +51,7 @@
                 {% for key, value in session.courses %}
                     <tr>
                         <td>
-                            <form action="/assignments" method="GET">
+                            <form action="/assignments_stu" method="GET">
                                 <input type="submit" name="courseId" class="btn btn-link" value="{{ key }}"/>
                             </form>
                         </td>
