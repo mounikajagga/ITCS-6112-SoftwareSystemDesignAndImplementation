@@ -19,7 +19,7 @@ def start(request):
             if request.session['type'] == 'S':
                 return render(request, "university_portal/student/welcome.html", {"session": request.session})
             elif request.session['type'] == 'F':
-                return render(request, "university_portal/faculties/assignment.html", {"session": request.session})
+                return render(request, "university_portal/faculties/teaches.html", {"session": request.session})
     return render(request, 'university_portal/login.html', {})
 
 # common views
@@ -121,14 +121,12 @@ def update(request):
                     print(rs)
 
                     con.commit()
-                    print("First")
-                    print(rs)
                     con.close()
                     return render(request, "university_portal/update_password.html",
                                   {"session": request.session,
                                    "updated": True})
                 else:
-                    return render(request, "university_portal/error.html",
+                    return render(request, "university_portal/update_password.html",
                                   {"session": request.session,
                                    "updated": False})
 
@@ -145,6 +143,7 @@ def update(request):
         return start(request)
 
 # student views
+
 
 def assignments_stu(request):
     if 'username' not in request.session:
