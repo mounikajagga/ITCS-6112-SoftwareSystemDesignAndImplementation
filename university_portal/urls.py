@@ -3,21 +3,22 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.start, name='start'),
-    url(r'^home', views.start, name='home'),
-    url(r'^login', views.login, name='login'),
-    url(r'^logout', views.logout, name="logout"),
+    url(r'^home$', views.start, name='home'),
+    url(r'^login$', views.login, name='login'),
+    url(r'^logout$', views.logout, name="logout"),
 
     # navbar
-    url(r'^about_us', views.about_us, name="about_us"),
-    url(r'^contact_us', views.contact_us, name="contact_us"),
+    url(r'^about_us$', views.about_us, name="about_us"),
+    url(r'^contact_us$', views.contact_us, name="contact_us"),
 
     # common
-    url(r'^profile', views.profile, name="profile"),
-    url(r'^update', views.update, name="update"),
+    url(r'^profile$', views.profile, name="profile"),
+    url(r'^update$', views.update, name="update"),
+    url(r'^update_password$', views.update_password, name='update_password'),
 
     # student
     url(r'^assignments_stu', views.assignments_stu, name='assignments_stu'),
-    url(r'^password_update', views.update_password, name='update_password'),
+
 
     # faculty
     url(r'^assignments', views.assignments, name='assignments'),

@@ -22,37 +22,47 @@ def start(request):
                 return render(request, "university_portal/faculties/assignment.html", {"session": request.session})
     return render(request, 'university_portal/login.html', {})
 
+# common views
+
 
 def login(request):
-    con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
-    cur = con.cursor()
-    statement = "SELECT pwd, email, typ FROM login WHERE email=\'" + request.POST['username'] + "\'"
-    cur.execute(statement)
-    rs = cur.fetchone()
-    con.close()
+    if 'username' in request.session:
+        return start(request)
 
-    if rs:
-        if rs[0] == request.POST['password']:
-            request.session['username'] = rs[1]
-            request.session['type'] = rs[2]
-            if rs[2] == 'S':
+    if 'login' in request.POST:
+        con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+        cur = con.cursor()
+        statement = "SELECT pwd, email, typ FROM login WHERE email=\'" + request.POST['username'] + "\'"
+        cur.execute(statement)
+        rs = cur.fetchone()
+        con.close()
 
-                request.session['student'] = get_student(request.session['username'])
-                request.session['courses'] = get_courses_stu(request.session['username'])
-                return render(request, "university_portal/student/welcome.html", {"session": request.session})
-            elif rs[2] == 'F':
-                request.session['faculty'] = get_faculty(request.session['username'])
-                request.session['courses'] = get_courses(request.session['username'])
-                return render(request, "university_portal/faculties/teaches.html",
-                              {"session": request.session, "faculty": request.session['faculty'],
-                               "courses": request.session['courses']})
-        return render(request, "university_portal/login.html", {"failed_login": True})
+        if rs:
+            if rs[0] == request.POST['password']:
+                request.session['username'] = rs[1]
+                request.session['type'] = rs[2]
+                if rs[2] == 'S':
+
+                    request.session['student'] = get_student(request.session['username'])
+                    request.session['courses'] = get_courses_stu(request.session['username'])
+                    return render(request, "university_portal/student/welcome.html", {"session": request.session})
+                elif rs[2] == 'F':
+                    request.session['faculty'] = get_faculty(request.session['username'])
+                    request.session['courses'] = get_courses(request.session['username'])
+                    return render(request, "university_portal/faculties/teaches.html",
+                                  {"session": request.session, "faculty": request.session['faculty'],
+                                   "courses": request.session['courses']})
+            return render(request, "university_portal/login.html", {"failed_login": True})
+        else:
+            return render(request, "university_portal/login.html", {"failed_login": True})
     else:
-        return render(request, "university_portal/login.html", {"failed_login": True})
+        return render(request, "university_portal/login.html")
 
 
 def logout(request):
     request.session.flush()
+    print('here')
+    print(request.session)
     return render(request, "university_portal/login.html", {})
 
 
@@ -69,6 +79,9 @@ def error(request):
 
 
 def profile(request):
+    if 'username' not in request.session:
+        return start(request)
+
     if request.session['type'] == 'S':
         return render(request, "university_portal/student/profile.html", {"session": request.session})
     elif request.session['type'] == 'F':
@@ -76,12 +89,69 @@ def profile(request):
     return render(request, "university_portal/login.html", {})
 
 
-# student views
+def update_password(request):
+    if 'username' not in request.session:
+        return start(request)
+    return render(request, "university_portal/update_password.html", {"session": request.session})
 
+
+def update(request):
+    if 'update' in request.POST:
+        upd_type = request.POST['update']
+
+        if upd_type == 'password':
+            con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+            cur = con.cursor()
+            statement = "SELECT pwd FROM login WHERE email=\'"\
+                        + request.session['username'] + "\'"
+            cur.execute(statement)
+            rs = cur.fetchone()
+
+            print(rs[0])
+            con.close()
+            if request.POST['oldpwd'] == rs[0]:
+                if request.POST['newpwd'] == request.POST['cnfpwd']:
+                    con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+                    cur = con.cursor()
+                    statement = "UPDATE login SET pwd=\'" + request.POST['newpwd'] + "\' WHERE email=\'" + request.session[
+                        'username'] + "\'"
+                    cur.execute(statement)
+                    rs = cur.fetchone()
+                    print("First")
+                    print(rs)
+
+                    con.commit()
+                    print("First")
+                    print(rs)
+                    con.close()
+                    return render(request, "university_portal/update_password.html",
+                                  {"session": request.session,
+                                   "updated": True})
+                else:
+                    return render(request, "university_portal/error.html",
+                                  {"session": request.session,
+                                   "updated": False})
+
+        elif upd_type == 'profile':
+            con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+            cur = con.cursor()
+            statement = "UPDATE students SET stu_phone_number=\'" + request.POST['new_phn_number'] + "\', email=\'" + request.POST['new_email'] + "\', address=\'" + request.POST['new_address'] + "\' WHERE email=\'" + request.session[
+                'username'] + "\'"
+            cur.execute(statement)
+            rs = cur.fetchone()
+            con.close()
+        return render(request, "university_portal/error.html", {"session": request.session})
+    else:
+        return start(request)
+
+# student views
 
 def assignments_stu(request):
     if 'username' not in request.session:
         return render(request, "university_portal/login.html", {})
+
+    if 'courseId' not in request.GET:
+        return render(request, "university_portal/student/welcome.html", {"session": request.session})
 
     all_assignments = get_all_posted_assignments(request.GET['courseId'], request.session['student'][1])
     submitted_assignments = get_submitted_assignments(request.GET['courseId'])
@@ -195,7 +265,7 @@ def get_due_assignments(all_assignments, submitted_assignments):
 def get_faculty(username):
     conn = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = conn.cursor()
-    statement = "select * from faculties where email=\'" + username + "\'"
+    statement = "SELECT * FROM faculties WHERE email=\'" + username + "\'"
     cur.execute(statement)
     faculty = cur.fetchone()
     conn.close()
@@ -205,7 +275,8 @@ def get_faculty(username):
 def get_courses(username):
     conn = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = conn.cursor()
-    statement = "select c.cid, c.cname, t.semester_of_teaching from courses c, login l, faculties f, teaches t where l.email=\'" + username + "\' and l.email = f.email and f.fid=t.fid and t.cid=c.cid"
+    statement = "SELECT c.cid, c.cname, t.semester_of_teaching FROM courses c, login l, faculties f, teaches t" \
+                " WHERE l.email=\'" + username + "\' AND l.email = f.email AND f.fid=t.fid AND t.cid=c.cid"
     cur.execute(statement)
     course = cur.fetchall()
     return course
@@ -214,7 +285,7 @@ def get_courses(username):
 def get_assignments(CourseID):
     conn = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = conn.cursor()
-    statement = "select DISTINCT a.aid,a.cid, c.cname from assignments a, courses c where a.cid=\'" + CourseID + "\' and a.cid=c.cid"
+    statement = "SELECT DISTINCT a.aid,a.cid, c.cname from assignments a, courses c where a.cid=\'" + CourseID + "\' and a.cid=c.cid"
     cur.execute(statement)
     all_assignment = cur.fetchall()
     return all_assignment
@@ -224,13 +295,13 @@ def get_grades(aid, Deadline):
     conn = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = conn.cursor()
     cur1 = conn.cursor()
-    statement = "update fac_submit set deadline_date= \'" + Deadline + "\' where aid= \'" + aid + "\'"
-    statement2 = "select DISTINCT s.SNAME, s.SID from students s, enroll e, assignments a, fac_submit f" \
+    statement = "UPDATE fac_submit SET deadline_date= \'" + Deadline + "\' WHERE aid= \'" + aid + "\'"
+    statement2 = "SELECT DISTINCT s.SNAME, s.SID from students s, enroll e, assignments a, fac_submit f" \
                  " WHERE s.sid = e.sid AND e.cid = a.cid AND a.aid = f.aid" \
                  " AND f.aid=\'" + aid + "\' AND deadline_date IS NOT NULL"
     cur.execute(statement)
     conn.commit()
-    statement = "select deadline_date from fac_submit where aid=\'" + aid + "\'"
+    statement = "SELECT deadline_date FROM fac_submit WHERE aid=\'" + aid + "\'"
     cur.execute(statement)
     cur1.execute(statement2)
     rs = cur.fetchall()
