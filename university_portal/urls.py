@@ -13,10 +13,11 @@ urlpatterns = [
 
     # common
     url(r'^profile', views.profile, name="profile"),
-    url(r'^update_password$', views.password, name="update"),
+    url(r'^update', views.update, name="update"),
 
     # student
     url(r'^assignments_stu', views.assignments_stu, name='assignments_stu'),
+    url(r'^password_update', views.update_password, name='update_password'),
 
     # faculty
     url(r'^assignments', views.assignments, name='assignments'),

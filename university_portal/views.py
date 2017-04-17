@@ -75,19 +75,6 @@ def profile(request):
         pass
     return render(request, "university_portal/login.html", {})
 
-def password(request):
-    if request.session:
-        return render(request, "university_portal/update_password.html", {})
-    else:
-        return render(request, "university_portal/error.html", {})
-
-
-def update_profile(request):
-    if request.session:
-        return render(request, "university_portal/update_password.html", {})
-    else:
-        return render(request, "university_portal/error.html", {})
-
 
 # student views
 
