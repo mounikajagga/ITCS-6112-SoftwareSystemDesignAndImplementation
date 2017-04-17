@@ -5,7 +5,7 @@ from datetime import datetime
 # Database connection parameters
 
 USER = 'root'
-PASSWORD = 'admin'
+PASSWORD = 'Sulphur@1234'
 HOST = '127.0.0.1'
 DATABASE = 'ssdi_project'
 
@@ -45,7 +45,7 @@ def login(request):
                 request.session['courses'] = get_courses(request.session['username'])
                 return render(request, "university_portal/faculties/teaches.html",
                               {"session": request.session, "faculty": request.session['faculty'],
-                               "courses": request.session['courses']})
+                              "courses": request.session['courses']})
 
     return render(request, "university_portal/login.html", {})
 
@@ -76,6 +76,45 @@ def profile(request):
 
 
 # student views
+# student profile and password update
+def update_password(request):
+    return render(request, "university_portal/update_password.html", {"session": request.session})
+
+
+def update(request):
+    # return render(request, "university_portal/update_password.html")
+    upd_type = request.POST['update']
+    if upd_type == 'password':
+        con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+        cur = con.cursor()
+        statement = "SELECt pwd FROM login WHERE email=\'" + request.session[
+                    'username'] + "\'"
+        cur.execute(statement)
+        rs = cur.fetchone()
+
+        # con.commit()
+        con.close()
+        if request.POST['oldpwd'] == rs[0]:
+            if request.POST['newpwd'] == request.POST['cnfpwd']:
+                con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+                cur = con.cursor()
+                statement = "UPDATE login SET pwd=\'" + request.POST['newpwd'] + "\' WHERE email=\'" + request.session[
+                    'username'] + "\'"
+                cur.execute(statement)
+                con.commit()
+                con.close()
+                return render(request, "university_portal/error.html")
+            else:
+                return render(request, "university_portal/update_password.html")
+
+    elif upd_type == 'profile':
+        con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+        cur = con.cursor()
+        statement = "UPDATE students SET stu_phone_number=\'" + request.POST['new_phn_number'] + "\', email=\'" + request.POST['new_email'] + "\', address=\'" + request.POST['new_address'] + "\' WHERE email=\'" + request.session[
+            'username'] + "\'"
+        cur.execute(statement)
+        rs = cur.fetchone()
+        con.close()
 
 
 def assignments_stu(request):
@@ -128,6 +167,14 @@ def grades(request):
 # ------------------------------------
 
 # student support functions
+
+
+
+
+
+
+
+
 
 
 def get_student(username):
