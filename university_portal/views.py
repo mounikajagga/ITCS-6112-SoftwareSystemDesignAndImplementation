@@ -46,8 +46,9 @@ def login(request):
                 return render(request, "university_portal/faculties/teaches.html",
                               {"session": request.session, "faculty": request.session['faculty'],
                                "courses": request.session['courses']})
-
-    return render(request, "university_portal/login.html", {})
+        return render(request, "university_portal/login.html", {"failed_login": True})
+    else:
+        return render(request, "university_portal/login.html", {"failed_login": True})
 
 
 def logout(request):
@@ -73,6 +74,19 @@ def profile(request):
     elif request.session['type'] == 'F':
         pass
     return render(request, "university_portal/login.html", {})
+
+def password(request):
+    if request.session:
+        return render(request, "university_portal/update_password.html", {})
+    else:
+        return render(request, "university_portal/error.html", {})
+
+
+def update_profile(request):
+    if request.session:
+        return render(request, "university_portal/update_password.html", {})
+    else:
+        return render(request, "university_portal/error.html", {})
 
 
 # student views
