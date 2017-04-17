@@ -6,3 +6,7 @@
 .navbar-brand{
     font-family: 'Satisfy', cursive;
 }
+
+body{
+    background-image: url("img/bg1.png");
+}
