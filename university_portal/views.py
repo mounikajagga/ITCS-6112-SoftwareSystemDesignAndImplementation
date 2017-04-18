@@ -61,8 +61,6 @@ def login(request):
 
 def logout(request):
     request.session.flush()
-    print('here')
-    print(request.session)
     return render(request, "university_portal/login.html", {})
 
 
@@ -107,7 +105,6 @@ def update(request):
             cur.execute(statement)
             rs = cur.fetchone()
 
-            print(rs[0])
             con.close()
             if request.POST['oldpwd'] == rs[0]:
                 if request.POST['newpwd'] == request.POST['cnfpwd']:
@@ -117,14 +114,8 @@ def update(request):
                         'username'] + "\'"
                     cur.execute(statement)
                     rs = cur.fetchone()
-                    print("First")
-                    print(rs)
-
                     con.commit()
                     request.session['student'] = get_student(request.session['username'])
-                    print("First")
-                    print(rs)
-                    con.close()
                     return render(request, "university_portal/update_password.html",
                                   {"session": request.session,
                                    "updated": True})
@@ -145,7 +136,6 @@ def update(request):
                 'username'] + "\'"
             cur.execute(statement)
             rs = cur.fetchone()
-            print("Second")
             con.commit()
             request.session['student'] = get_student(request.session['username'])
             con.close()
@@ -199,7 +189,6 @@ def grades(request):
         assign = get_assignments(request.GET['CourseID'])
         faculty = get_faculty(request.session['username'])
         assignment, students = get_grades(request.GET['aid'], request.GET['Deadline'])
-        print(datetime.today())
         return render(request, "university_portal/faculties/assignment.html",
                       {"session": request.session, "students": students, "faculties": faculty, "assignments": assign,
                        "deadline": assignment, "mindate": datetime.now().strftime("%Y-%m-%d")})
