@@ -5,7 +5,7 @@ from datetime import datetime
 # Database connection parameters
 
 USER = 'root'
-PASSWORD = 'Sulphur@1234'
+PASSWORD = 'admin'
 HOST = '127.0.0.1'
 DATABASE = 'ssdi_project'
 
@@ -19,7 +19,7 @@ def start(request):
             if request.session['type'] == 'S':
                 return render(request, "university_portal/student/welcome.html", {"session": request.session})
             elif request.session['type'] == 'F':
-                return render(request, "university_portal/faculties/assignment.html", {"session": request.session})
+                return render(request, "university_portal/faculties/teaches.html", {"session": request.session})
     return render(request, 'university_portal/login.html', {})
 
 # common views
