@@ -5,7 +5,7 @@ from datetime import datetime
 # Database connection parameters
 
 USER = 'root'
-PASSWORD = 'root123'
+PASSWORD = 'admin'
 HOST = '127.0.0.1'
 DATABASE = 'ssdi_project'
 
