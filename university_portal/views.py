@@ -151,6 +151,7 @@ def update(request):
 
 # student views
 
+
 def assignments_stu(request):
     if 'username' not in request.session:
         return render(request, "university_portal/login.html", {})
@@ -159,7 +160,7 @@ def assignments_stu(request):
         return render(request, "university_portal/student/welcome.html", {"session": request.session})
 
     all_assignments = get_all_posted_assignments(request.GET['courseId'], request.session['student'][1])
-    submitted_assignments = get_submitted_assignments(request.GET['courseId'])
+    submitted_assignments = get_submitted_assignments(request.GET['courseId'], request.session['student'][1])
     due_assignments = get_due_assignments(all_assignments, submitted_assignments)
 
     return render(request, "university_portal/student/assignments.html",
@@ -168,6 +169,9 @@ def assignments_stu(request):
                    "submitted_assignments": submitted_assignments,
                    "due_assignments": due_assignments})
 
+
+def assignment_submit(request):
+    pass
 
 # faculties views
 
@@ -237,11 +241,12 @@ def get_all_posted_assignments(courseid, sid):
     return all_assignments
 
 
-def get_submitted_assignments(courseid):
+def get_submitted_assignments(courseid, sid):
     con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = con.cursor()
     statement = "SELECT DISTINCT s.aid, s.date_of_submission, s.grade FROM stu_submit s " \
-                "WHERE s.aid IN (SELECT DISTINCT aid FROM assignments WHERE cid=\'" + courseid + "\')"
+                "WHERE sid = \'" + sid + "\' AND s.aid IN" \
+                                         "(SELECT DISTINCT aid FROM assignments WHERE cid=\'" + courseid + "\')"
 
     cur.execute(statement)
     submitted_assignments = cur.fetchall()
@@ -249,17 +254,17 @@ def get_submitted_assignments(courseid):
     return submitted_assignments
 
 
-def get_due_assignments(all_assignments, submitted_assignments):
+def get_due_assignments(fac_assignments, submitted_assignments):
     due_assignments = []
 
-    for all_aid, fac, grade in all_assignments:
+    for assignment in fac_assignments:
         exist = False
-        for sub_aid, sub_date, sub_grade in submitted_assignments:
-            if all_aid == sub_aid:
+        for stu_assignment in submitted_assignments:
+            if assignment[0] == stu_assignment[0]:
                 exist = True
                 break
         if not exist:
-            due_assignments.append(all_aid)
+            due_assignments.append(assignment)
     return due_assignments
 
 

@@ -21,7 +21,7 @@
             <li><a href="contact_us">Contact Us</a></li>
             <li><a href="about_us">About Us</a></li>
         </ul>
-         <ul class="nav navbar-nav navbar-right">
+        <ul class="nav navbar-nav navbar-right">
             <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">
                 <span class="glyphicon glyphicon-user"></span> {{ session.student.0 }} <span class="caret"/></a>
                 <ul class="dropdown-menu">
@@ -55,20 +55,30 @@
                             <tr>
                                 <th>Assignment</th>
                                 <th>Due date</th>
+                                <th>Submit</th>
                                 <th></th>
                             </tr>
                             </thead>
                             <tbody>
-                            {% for aid in due_assignments %}
-                                <tr>
-                                    <td>{{ aid }}</td>
-                                    <td>Date</td>
-                                    <td>
-                                        <form action="assignment_submit">
-                                            Select file: <input type="file" name="assign_file"><input type="submit">
-                                        </form>
-                                    </td>
-                                </tr>
+                            {% for aid, fid, deadline in  due_assignments %}
+                                <form action="assignment_submit" method="post">
+                                    <input type="hidden" name="aid" value="{{ aid }}_{{ session.student.1 }}"/>
+                                    <tr>
+                                        <td>{{ aid }}</td>
+                                        <td>{{ deadline }}</td>
+                                        <td>
+                                            <span class="btn btn-default btn-file">
+                                                <input type="file" name="assign_file">
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button type="submit" class="btn btn-xs btn-info">
+                                            <span class="glyphicon glyphicon-send" data-toggle="tooltip"
+                                                  title="Submit"></span>&nbsp;
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </form>
                             {% endfor %}
                             </tbody>
                         </table>
@@ -88,11 +98,11 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for aid, dos, g in submitted_assignments %}
+                        {% for aid, dos, grade in submitted_assignments %}
                             <tr>
                                 <td>{{ aid }}</td>
                                 <td>{{ dos }}</td>
-                                <td>{{ d }}</td>
+                                <td>{{ grade }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>

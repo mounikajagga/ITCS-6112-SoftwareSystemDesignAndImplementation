@@ -20,7 +20,7 @@ urlpatterns = [
 
     # student
     url(r'^assignments_stu', views.assignments_stu, name='assignments_stu'),
-
+    url(r'^assignment_submit$', views.assignment_submit, name='assignment_submit'),
 
     # faculty
     url(r'^assignments', views.assignments, name='assignments'),
