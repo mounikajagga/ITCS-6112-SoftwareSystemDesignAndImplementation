@@ -110,15 +110,24 @@
                                 <td>{{ all.0 }}</td>
                                 <td>{{ all.1 }}</td>
                                 <td>{{ all.2 }}</td>
-                                <td><input type="date" name="Deadline" required="true" min={{ mindate }}/></td>
-                                {{ mindate }}
-                                <td>
-                                    <button type="submit" class="btn btn-xs btn-info">
+                                <td><input type="date" name="Deadline" required="true"/></td>
+                                {% if all.0 == assignment_posted.0.0 or all.0 == assignment_posted.1.0 %}
+                                    <td>
+                                        <button type="submit" class="btn btn-xs btn-info" disabled>
                                             <span class="glyphicon glyphicon-send" data-toggle="tooltip"
                                                   title="Post"></span>&nbsp;
-                                        <input type="hidden" name="aid" value="{{ all.0 }}"/>
-                                    </button>
-                                </td>
+                                            <input type="hidden" name="aid" value="{{ all.0 }}"/>
+                                        </button>
+                                        {% else %}
+                                    </td>
+                                    <td>
+                                        <button type="submit" class="btn btn-xs btn-info">
+                                            <span class="glyphicon glyphicon-send" data-toggle="tooltip"
+                                                  title="Post"></span>&nbsp;
+                                            <input type="hidden" name="aid" value="{{ all.0 }}"/>
+                                        </button>
+                                    </td>
+                                {% endif %}
                             </tr>
                         </form>
                     {% endfor %}
@@ -137,7 +146,7 @@
                     Below are the details of your assignment:
                 </h4>
 
-                {% for all in assignments %}
+                {% for all in assignment_posted %}
                     <div class="panel panel-info">
                         <div class="panel-heading">
                             <h4 class="panel-title">
@@ -190,9 +199,6 @@
                     </div>
                 {% endfor %}
             {% endif %}
-
-            <h3>{{ deadline.0 }}</h3>
-
         </div>
     </div>
 </div>

@@ -5,7 +5,7 @@ from datetime import datetime
 # Database connection parameters
 
 USER = 'root'
-PASSWORD = 'admin'
+PASSWORD = 'root123'
 HOST = '127.0.0.1'
 DATABASE = 'ssdi_project'
 
@@ -181,18 +181,19 @@ def assignments(request):
                       {"session": request.session, "assignments": assign, "faculties": faculty,
                        "mindate": datetime.today()})
 
-
+###### - Ishan
 def grades(request):
     if 'username' not in request.session:
         return render(request, "university_portal/login.html", {})
     else:
         assign = get_assignments(request.GET['CourseID'])
         faculty = get_faculty(request.session['username'])
-        assignment, students = get_grades(request.GET['aid'], request.GET['Deadline'])
+        assignment, students, assignment_posted = get_grades(request.GET['aid'], request.GET['Deadline'])
         return render(request, "university_portal/faculties/assignment.html",
                       {"session": request.session, "students": students, "faculties": faculty, "assignments": assign,
-                       "deadline": assignment, "mindate": datetime.now().strftime("%Y-%m-%d")})
+                       "deadline": assignment, "assignment_posted":assignment_posted})
 
+###### - Ishan
 
 # ------------------------------------
 # Views End
@@ -299,7 +300,9 @@ def get_grades(aid, Deadline):
     conn = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = conn.cursor()
     cur1 = conn.cursor()
+    cur2 = conn.cursor()
     statement = "UPDATE fac_submit SET deadline_date= \'" + Deadline + "\' WHERE aid= \'" + aid + "\'"
+    statement1 = "SELECT DISTINCT AID from fac_submit WHERE deadline_date != 'NULL' "
     statement2 = "SELECT DISTINCT s.SNAME, s.SID from students s, enroll e, assignments a, fac_submit f" \
                  " WHERE s.sid = e.sid AND e.cid = a.cid AND a.aid = f.aid" \
                  " AND f.aid=\'" + aid + "\' AND deadline_date IS NOT NULL"
@@ -307,7 +310,9 @@ def get_grades(aid, Deadline):
     conn.commit()
     statement = "SELECT deadline_date FROM fac_submit WHERE aid=\'" + aid + "\'"
     cur.execute(statement)
-    cur1.execute(statement2)
+    cur1.execute(statement1)
+    cur2.execute(statement2)
     rs = cur.fetchall()
     rs1 = cur1.fetchall()
-    return rs, rs1
+    rs2 = cur2.fetchall()
+    return rs, rs2 , rs1
