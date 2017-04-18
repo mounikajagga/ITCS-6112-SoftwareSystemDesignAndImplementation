@@ -37,7 +37,24 @@
             <h2>Hi, {{ session.student.0 }}!</h2>
             <h4>Your Profile! </h4>
             <br><br>
-            <form action="/update" method="GET" class="form-horizontal">
+             {% if updated %}
+                <div class="form-group">
+                    <div class="alert alert-success alert-dismissable fade in">
+                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                        <strong>Done!</strong> Profile updated.
+                    </div>
+                </div>
+            {% elif not updated and updated is not None %}
+                 <div class="form-group">
+                    <div class="alert alert-danger alert-dismissable fade in">
+                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                        <strong>Oops!</strong> Something went wrong.
+                    </div>
+                </div>
+            {% endif %}
+            <form action="/update" method="POST" class="form-horizontal">{% csrf_token %}
                 <input type="hidden" name="update" value="profile"/>
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="studentID">Student

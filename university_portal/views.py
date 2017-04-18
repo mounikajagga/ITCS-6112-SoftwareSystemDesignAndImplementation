@@ -5,7 +5,7 @@ from datetime import datetime
 # Database connection parameters
 
 USER = 'root'
-PASSWORD = 'admin'
+PASSWORD = 'Sulphur@1234'
 HOST = '127.0.0.1'
 DATABASE = 'ssdi_project'
 
@@ -121,6 +121,7 @@ def update(request):
                     print(rs)
 
                     con.commit()
+                    request.session['student'] = get_student(request.session['username'])
                     print("First")
                     print(rs)
                     con.close()
@@ -128,19 +129,33 @@ def update(request):
                                   {"session": request.session,
                                    "updated": True})
                 else:
-                    return render(request, "university_portal/error.html",
+                    return render(request, "university_portal/update_password.html",
                                   {"session": request.session,
                                    "updated": False})
+
+            else:
+                return render(request, "university_portal/update_password.html",
+                              {"session": request.session,
+                               "updated": False})
 
         elif upd_type == 'profile':
             con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
             cur = con.cursor()
-            statement = "UPDATE students SET stu_phone_number=\'" + request.POST['new_phn_number'] + "\', email=\'" + request.POST['new_email'] + "\', address=\'" + request.POST['new_address'] + "\' WHERE email=\'" + request.session[
+            statement = "UPDATE students SET Stu_Phone_Number=\'" + request.POST['stuPhNo'] + "\', address=\'" + request.POST['address'] + "\' WHERE Email=\'" + request.session[
                 'username'] + "\'"
             cur.execute(statement)
             rs = cur.fetchone()
+            print("Second")
+            con.commit()
+            request.session['student'] = get_student(request.session['username'])
             con.close()
-        return render(request, "university_portal/error.html", {"session": request.session})
+            return render(request, "university_portal/student/profile.html",
+                          {"session": request.session,
+                           "updated": True})
+        else:
+            return render(request, "university_portal/student/profile.html",
+                          {"session": request.session,
+                           "updated": False})
     else:
         return start(request)
 
