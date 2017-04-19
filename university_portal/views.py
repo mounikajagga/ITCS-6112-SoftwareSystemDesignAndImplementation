@@ -5,7 +5,7 @@ from datetime import datetime
 # Database connection parameters
 
 USER = 'root'
-PASSWORD = 'admin'
+PASSWORD = 'root123'
 HOST = '127.0.0.1'
 DATABASE = 'ssdi_project'
 
@@ -21,6 +21,7 @@ def start(request):
             elif request.session['type'] == 'F':
                 return render(request, "university_portal/faculties/teaches.html", {"session": request.session})
     return render(request, 'university_portal/login.html', {})
+
 
 # common views
 
@@ -61,8 +62,6 @@ def login(request):
 
 def logout(request):
     request.session.flush()
-    print('here')
-    print(request.session)
     return render(request, "university_portal/login.html", {})
 
 
@@ -102,29 +101,23 @@ def update(request):
         if upd_type == 'password':
             con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
             cur = con.cursor()
-            statement = "SELECT pwd FROM login WHERE email=\'"\
+            statement = "SELECT pwd FROM login WHERE email=\'" \
                         + request.session['username'] + "\'"
             cur.execute(statement)
             rs = cur.fetchone()
 
-            print(rs[0])
             con.close()
             if request.POST['oldpwd'] == rs[0]:
                 if request.POST['newpwd'] == request.POST['cnfpwd']:
                     con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
                     cur = con.cursor()
-                    statement = "UPDATE login SET pwd=\'" + request.POST['newpwd'] + "\' WHERE email=\'" + request.session[
-                        'username'] + "\'"
+                    statement = "UPDATE login SET pwd=\'" + request.POST['newpwd'] + "\' WHERE email=\'" + \
+                                request.session[
+                                    'username'] + "\'"
                     cur.execute(statement)
                     rs = cur.fetchone()
-                    print("First")
-                    print(rs)
-
                     con.commit()
                     request.session['student'] = get_student(request.session['username'])
-                    print("First")
-                    print(rs)
-                    con.close()
                     return render(request, "university_portal/update_password.html",
                                   {"session": request.session,
                                    "updated": True})
@@ -141,11 +134,11 @@ def update(request):
         elif upd_type == 'profile':
             con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
             cur = con.cursor()
-            statement = "UPDATE students SET Stu_Phone_Number=\'" + request.POST['stuPhNo'] + "\', address=\'" + request.POST['address'] + "\' WHERE Email=\'" + request.session[
-                'username'] + "\'"
+            statement = "UPDATE students SET Stu_Phone_Number=\'" + request.POST['stuPhNo'] + "\', address=\'" + \
+                        request.POST['address'] + "\' WHERE Email=\'" + request.session[
+                            'username'] + "\'"
             cur.execute(statement)
             rs = cur.fetchone()
-            print("Second")
             con.commit()
             request.session['student'] = get_student(request.session['username'])
             con.close()
@@ -158,6 +151,7 @@ def update(request):
                            "updated": False})
     else:
         return start(request)
+
 
 # student views
 
@@ -185,24 +179,46 @@ def assignments(request):
     if 'username' not in request.session:
         return render(request, "university_portal/login.html", {})
     else:
-        assign = get_assignments(request.GET['CourseID'])
+
+        if 'CourseID' not in request.session:
+            request.session['CourseID'] = request.GET['CourseID']
+
+        assign = get_assignments(request.session['CourseID'])
         faculty = get_faculty(request.session['username'])
         return render(request, "university_portal/faculties/assignment.html",
                       {"session": request.session, "assignments": assign, "faculties": faculty,
                        "mindate": datetime.today()})
 
 
+###### - Ishan
+
 def grades(request):
     if 'username' not in request.session:
         return render(request, "university_portal/login.html", {})
     else:
-        assign = get_assignments(request.GET['CourseID'])
+        assign = get_assignments(request.session['CourseID'])
         faculty = get_faculty(request.session['username'])
-        assignment, students = get_grades(request.GET['aid'], request.GET['Deadline'])
-        print(datetime.today())
+        if 'aid' not in request.session and 'Deadline' not in request.session:
+            request.session['aid'] = request.GET['aid']
+            request.session['Deadline'] = request.GET['Deadline']
+        assignment, students, assignment_posted = get_grades(request.session['aid'], request.session['Deadline'])
+
         return render(request, "university_portal/faculties/assignment.html",
-                      {"session": request.session, "students": students, "faculties": faculty, "assignments": assign,
-                       "deadline": assignment, "mindate": datetime.now().strftime("%Y-%m-%d")})
+                      {"session": request.session, "students": students, "faculties": faculty,
+                       "assignments": assign,
+                       "deadline": assignment, "assignment_posted": assignment_posted})
+
+
+def student_grade(request):
+    if 'username' not in request.session:
+        return render(request, "university_portal/login.html", {})
+    else:
+        student_grade = set_stu_grade(request.GET['grade_assign'], request.GET['stu_id'], request.GET['aid'])
+        return grades(request)
+
+
+###### - Ishan
+
 
 
 # ------------------------------------
@@ -310,7 +326,9 @@ def get_grades(aid, Deadline):
     conn = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = conn.cursor()
     cur1 = conn.cursor()
+    cur2 = conn.cursor()
     statement = "UPDATE fac_submit SET deadline_date= \'" + Deadline + "\' WHERE aid= \'" + aid + "\'"
+    statement1 = "SELECT DISTINCT AID from fac_submit WHERE deadline_date IS NOT NULL "
     statement2 = "SELECT DISTINCT s.SNAME, s.SID from students s, enroll e, assignments a, fac_submit f" \
                  " WHERE s.sid = e.sid AND e.cid = a.cid AND a.aid = f.aid" \
                  " AND f.aid=\'" + aid + "\' AND deadline_date IS NOT NULL"
@@ -318,7 +336,17 @@ def get_grades(aid, Deadline):
     conn.commit()
     statement = "SELECT deadline_date FROM fac_submit WHERE aid=\'" + aid + "\'"
     cur.execute(statement)
-    cur1.execute(statement2)
+    cur1.execute(statement1)
+    cur2.execute(statement2)
     rs = cur.fetchall()
     rs1 = cur1.fetchall()
-    return rs, rs1
+    rs2 = cur2.fetchall()
+    return rs, rs2, rs1
+
+
+def set_stu_grade(stu_grades, stu_id, aid):
+    conn = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+    cur = conn.cursor()
+    statement = "UPDATE stu_submit SET grade=\'" + stu_grades + "\' WHERE sid =\'" + stu_id + " \'and aid=\'" + aid + "\'"
+    cur.execute(statement)
+    conn.commit()

@@ -43,35 +43,46 @@
 <div>
     <div class="col-sm-3"></div>
     <div class="col-sm-6">
-        <text>Hi <strong><i>
-            <mark>{{ session.faculty.1 }}</mark>
-        </i></strong>!! HOW YOU ARE DOING TODAY
-        </text>
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>Course ID</th>
-                <th>Course Name</th>
-                <th>Semester</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for key, value, sem in session.courses %}
+        <div class="row">
+            <div class="col-sm-7">
+                <h2>Hi, {{ session.faculty.1 }}!</h2>
+                <h4>How are you doing today?</h4>
+                <br>
+
+            </div>
+            <div class="col-sm-5">
+                <img src="static/img/icon.jpg" class="img-circle" alt="{{ names.1 }}" height="100" width="100"
+                    style="float: right;" />
+            </div>
+        </div>
+        <div class="row">
+            <h5>Your Courses</h5>
+            <table class="table table-striped">
+                <thead>
                 <tr>
-                    <td>
-                        <form action="assignments" method="GET">
-                            <input type="submit" name="CourseID" class="btn btn-link" value="{{ key }}"/>
-                        </form>
-                    </td>
-                    <td>{{ value }}</td>
-                    <td>{{ sem }}</td>
+                    <th>Course ID</th>
+                    <th>Course Name</th>
+                    <th>Semester</th>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {% for key, value, sem in session.courses %}
+                    <tr>
+                        <td>
+                            <form action="assignments" method="GET">
+                                <input type="submit" name="CourseID" class="btn btn-link" value="{{ key }}"/>
+                            </form>
+                        </td>
+                        <td>{{ value }}</td>
+                        <td>{{ sem }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="col-sm-3">
-        <img src="static/img/icon.jpg" class="img-circle" alt="{{ names.1 }}" height="200" width="200"/>
+
     </div>
 </div>
 

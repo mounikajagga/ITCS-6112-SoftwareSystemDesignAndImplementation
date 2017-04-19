@@ -1,5 +1,7 @@
 from django.conf.urls import url
 from . import views
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
     url(r'^$', views.start, name='start'),
@@ -23,7 +25,9 @@ urlpatterns = [
     # faculty
     url(r'^assignments', views.assignments, name='assignments'),
     url(r'^grades', views.grades, name='grades'),
+    url(r'^student_grade', views.student_grade, name='student_grade'),
 
-    url(r'.*', views.error, name='error')
-
+    # miscellaneous
+    url(r'^favicon.ico$', RedirectView.as_view(url=staticfiles_storage.url('favicon.ico'), permanent=False), name="favicon"),
+    url(r'.*', views.error, name='error'),
 ]
