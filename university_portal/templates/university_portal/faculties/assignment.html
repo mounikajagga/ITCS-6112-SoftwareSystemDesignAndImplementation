@@ -118,6 +118,7 @@
                                         <button type="submit" class="btn btn-xs btn-info" disabled>
                                             <span class="glyphicon glyphicon-send" data-toggle="tooltip"
                                                   title="Post"></span>&nbsp;
+                                            <input type="hidden" name="grade_count" value='0'>
                                             <input type="hidden" name="aid" value="{{ all.0 }}"/>
                                         </button>
                                         {% else %}
@@ -143,7 +144,7 @@
             {% if deadline is empty %}
                 <h1>You have not posted anything</h1>
             {% else %}
-                <h4>Hello !!!
+                <h4>Hello !!!!
                     <mark><strong><i>{{ session.faculty.1 }}</i></strong></mark>
                     Below are the details of your assignment:
                 </h4>
@@ -170,25 +171,27 @@
                             </thead>
                             <tbody>
                             <tr>
-                                {% for all in students %}
+                                {% for stu in students %}
                                     <td>
-                                        {{ all.0 }}
+                                        {{ stu.0 }}
                                     </td>
                                     <td>
-                                        {{ all.1 }}
+                                        {{ stu.1 }}
                                     </td>
                                     <td></td>
-                                    <form action="#" method="POST">
+                                    <form action="student_grade" method="GET">
                                         <td>
                                             <select name="grade_assign">
-                                                <option value="assign">----</option>
-                                                <option value="assign">A</option>
-                                                <option value="assign">B</option>
-                                                <option value="assign">C</option>
-                                                <option value="assign">D</option>
+                                                <option value="stu_grade">----</option>
+                                                <option value="A">A</option>
+                                                <option value="B">B</option>
+                                                <option value="C">C</option>
+                                                <option value="D">D</option>
                                             </select>
                                         </td>
                                         <td>
+                                            <input type="hidden" name="stu_id" value="{{ stu.1 }}"/>
+                                            <input type="hidden" name="aid" value="{{ all.0 }}" />
                                             <button type="submit" class="btn-info btn-xs"><span
                                                     class="glyphicon glyphicon-ok"></span></button>
                                         </td>
