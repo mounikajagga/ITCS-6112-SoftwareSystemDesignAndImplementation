@@ -178,6 +178,7 @@ def assignment_submit(request):
     pass
 
 # faculties views
+###### - Ishan
 
 def assignments(request):
     if 'username' not in request.session:
@@ -187,30 +188,31 @@ def assignments(request):
         if 'CourseID' not in request.session:
             request.session['CourseID'] = request.GET['CourseID']
 
-        assign = get_assignments(request.session['CourseID'])
+        assign, deadline_check = get_assignments(request.session['CourseID'], request.session['username'])
         faculty = get_faculty(request.session['username'])
         return render(request, "university_portal/faculties/assignment.html",
                       {"session": request.session, "assignments": assign, "faculties": faculty,
-                       "mindate": datetime.today()})
+                       "mindate": datetime.today(), "deadline_check": deadline_check})
 
-
-###### - Ishan
 
 def grades(request):
     if 'username' not in request.session:
         return render(request, "university_portal/login.html", {})
     else:
-        assign = get_assignments(request.session['CourseID'])
+
         faculty = get_faculty(request.session['username'])
         if 'aid' not in request.session and 'Deadline' not in request.session:
             request.session['aid'] = request.GET['aid']
             request.session['Deadline'] = request.GET['Deadline']
-        assignment, students, assignment_posted = get_grades(request.session['aid'], request.session['Deadline'])
-
+        assignment, students, assignment_posted = get_grades(request.GET['aid'], request.GET['Deadline'],
+                                                             faculty)
+        print (assignment)
+        assign, deadline_check = get_assignments(request.session['CourseID'], faculty)
         return render(request, "university_portal/faculties/assignment.html",
                       {"session": request.session, "students": students, "faculties": faculty,
                        "assignments": assign,
-                       "deadline": assignment, "assignment_posted": assignment_posted})
+                       "deadline": assignment, "assignment_posted": assignment_posted,
+                       "deadline_check": deadline_check})
 
 
 def student_grade(request):
@@ -318,28 +320,35 @@ def get_courses(username):
     return course
 
 
-def get_assignments(CourseID):
+def get_assignments(CourseID, Fname):
     conn = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = conn.cursor()
+    cur1 = conn.cursor()
     statement = "SELECT DISTINCT a.aid,a.cid, c.cname from assignments a, courses c where a.cid=\'" + CourseID + "\' and a.cid=c.cid"
+    statement1 = "SELECT DISTINCT f_sub.deadline_date FROM fac_submit f_sub, faculties f WHERE f_sub.deadline_date IS NOT NULL AND f_sub.FID = f.FID AND F.FName =\'" + \
+                 Fname[1] + "\'"
     cur.execute(statement)
+    cur1.execute(statement1)
     all_assignment = cur.fetchall()
-    return all_assignment
+    rs = cur1.fetchall()
+    return (all_assignment, rs)
 
 
-def get_grades(aid, Deadline):
+def get_grades(aid, Deadline, Fname):
     conn = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = conn.cursor()
     cur1 = conn.cursor()
     cur2 = conn.cursor()
-    statement = "UPDATE fac_submit SET deadline_date= \'" + Deadline + "\' WHERE aid= \'" + aid + "\'"
+    statement = "UPDATE fac_submit SET deadline_date= \'" + Deadline + "\' WHERE aid= \'" + aid + "\' and FID = (select fid from faculties where fname =\'" + \
+                Fname[1] + "\')"
     statement1 = "SELECT DISTINCT AID from fac_submit WHERE deadline_date IS NOT NULL "
     statement2 = "SELECT DISTINCT s.SNAME, s.SID from students s, enroll e, assignments a, fac_submit f" \
                  " WHERE s.sid = e.sid AND e.cid = a.cid AND a.aid = f.aid" \
                  " AND f.aid=\'" + aid + "\' AND deadline_date IS NOT NULL"
     cur.execute(statement)
     conn.commit()
-    statement = "SELECT deadline_date FROM fac_submit WHERE aid=\'" + aid + "\'"
+    statement = "SELECT DISTINCT deadline_date, aid FROM fac_submit WHERE FID = (select fid from faculties where fname =\'" + \
+                Fname[1] + "\') and deadline_date is not NULL"
     cur.execute(statement)
     cur1.execute(statement1)
     cur2.execute(statement2)
