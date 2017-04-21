@@ -204,7 +204,7 @@ def grades(request):
         if 'aid' not in request.session and 'Deadline' not in request.session:
             request.session['aid'] = request.GET['aid']
             request.session['Deadline'] = request.GET['Deadline']
-        assignment, students, assignment_posted = get_grades(request.GET['aid'], request.GET['Deadline'],
+        assignment, students, assignment_posted = get_grades(request.GET['aid'], request.session['Deadline'],
                                                              faculty)
         print (assignment)
         assign, deadline_check = get_assignments(request.session['CourseID'], faculty)
