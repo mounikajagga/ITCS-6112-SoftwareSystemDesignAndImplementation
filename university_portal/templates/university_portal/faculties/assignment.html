@@ -167,7 +167,8 @@
                             </thead>
                             <tbody>
                             <tr>
-                                {% for stu in aid_studentsList.aidKey %}
+                                {% for stu in aid_studentsList %}
+
                                     {% if stu.3 == aid %}
                                         <td>
                                             {{ stu.0 }}
@@ -176,11 +177,7 @@
                                             {{ stu.1 }}
                                         </td>
                                         <td>
-                                            {% if deadline.0.1 == all.0 %}
-                                                {{ deadline.0.0|date:"SHORT_DATE_FORMAT" }}
-                                            {% else %}
-                                                {{ deadline.1.0|date:"SHORT_DATE_FORMAT" }}
-                                            {% endif %}
+                                            {{ stu.4|date:"SHORT_DATE_FORMAT" }}
                                         </td>
                                         <form action="student_grade" method="GET">
                                             <td>
@@ -195,7 +192,7 @@
 
 
                                                 <input type="hidden" name="stu_id" value="{{ stu.1 }}"/>
-                                                <input type="hidden" name="aid" value="{{ all.0 }}"/>
+                                                <input type="hidden" name="aid" value="{{ aid }}"/>
                                                 <button type="submit" class="btn-info btn-xs"><span
                                                         class="glyphicon glyphicon-ok"></span></button>
                                             </td>

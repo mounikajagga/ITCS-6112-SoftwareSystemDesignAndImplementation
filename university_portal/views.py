@@ -157,7 +157,6 @@ def update(request):
 
 
 def fac_profile_update(request):
-    print(request)
     if 'username' not in request.session:
         return start(request)
 
@@ -262,12 +261,11 @@ def assignments(request):
         fac_submitted_assignments = get_fac_submitted_assignments(request.session['CourseID'], faculty[0])
 
         fac_submitted_aid = retrieve_aid(fac_submitted_assignments)
-        print(fac_submitted_aid)
 
-        aid_studentsList ={}
+        aid_studentsList = []
         # get students for a assignment
         for aid in fac_submitted_aid:
-            aid_studentsList['aidKey'] = get_students_with_assignment(aid, faculty[0])
+            aid_studentsList.extend(get_students_with_assignment(aid, faculty[0]))
 
         return render(request, "university_portal/faculties/assignment.html",
                       {"session": request.session,
@@ -279,7 +277,6 @@ def assignments(request):
 
 
 def post_assignment(request):
-    print("post_assignment")
     if 'username' not in request.session:
         return render(request, "university_portal/login.html", {})
     else:
@@ -296,15 +293,12 @@ def post_assignment(request):
         return assignments(request)
 
 
-
-
-
 def student_grade(request):
     if 'username' not in request.session:
         return render(request, "university_portal/login.html", {})
     else:
         set_stu_grade(request.GET['grade_assign'], request.GET['stu_id'], request.GET['aid'])
-        return post_assignment(request)
+        return assignments(request)
 
 
 ###### - Ishan
@@ -438,12 +432,12 @@ def retrieve_aid(fac_submitted_assignments):
 def get_students_with_assignment(aid, fid):
     conn = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = conn.cursor()
-    statement = "SELECT DISTINCT s.SNAME, s.SID, ss.grade, a.aid from students s, enroll e, assignments a, fac_submit f,  stu_submit ss" \
+    statement = "SELECT DISTINCT s.SNAME, s.SID, ss.grade, a.aid, f.deadline_date from students s, enroll e, assignments a, fac_submit f,  stu_submit ss" \
     " WHERE s.sid = e.sid AND s.sid = ss.sid AND ss.aid = a.aid AND e.cid = a.cid AND a.aid = f.aid" \
     " AND f.fid=\'" + fid + "\' AND deadline_date IS NOT NULL AND f.aid = \'" + aid + "\'"
     cur.execute(statement)
 
-    students_with_assignment = cur.fetchall()
+    students_with_assignment = list(cur.fetchall())
 
     return students_with_assignment
 
@@ -454,3 +448,4 @@ def set_stu_grade(stu_grades, stu_id, aid):
     statement = "UPDATE stu_submit SET grade=\'" + stu_grades + "\' WHERE sid =\'" + stu_id + " \'and aid=\'" + aid + "\'"
     cur.execute(statement)
     conn.commit()
+    return
