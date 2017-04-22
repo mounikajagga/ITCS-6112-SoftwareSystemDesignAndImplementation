@@ -241,8 +241,12 @@ def assignments_stu(request):
                    "due_assignments": due_assignments})
 
 
+def assignment_submit(request):
+    pass
+
 # faculties views
 ###### - Ishan
+
 
 def assignments(request):
     if 'username' not in request.session:
@@ -254,9 +258,18 @@ def assignments(request):
 
         assign, deadline_check = get_assignments(request.session['CourseID'], request.session['username'])
         faculty = get_faculty(request.session['username'])
+        assignment, students, assignment_posted = get_grades(None, None, faculty)
+
+        print("POST ASS", assignment)
+
         return render(request, "university_portal/faculties/assignment.html",
-                      {"session": request.session, "assignments": assign, "faculties": faculty,
-                       "mindate": datetime.today(), "deadline_check": deadline_check})
+                      {"session": request.session,
+                       "students": students,
+                       "assignments": assign,
+                       "faculties": faculty,
+                       "deadline_check": deadline_check,
+                       "deadline": assignment,
+                       "assignment_posted": assignment_posted})
 
 
 def grades(request):
@@ -268,14 +281,17 @@ def grades(request):
         if 'aid' not in request.session and 'Deadline' not in request.session:
             request.session['aid'] = request.GET['aid']
             request.session['Deadline'] = request.GET['Deadline']
-        assignment, students, assignment_posted = get_grades(request.GET['aid'], request.session['Deadline'],
+        assignment, students, assignment_posted = get_grades(request.session['aid'], request.session['Deadline'],
                                                              faculty)
-        print (assignment)
+        print(assignment)
         assign, deadline_check = get_assignments(request.session['CourseID'], faculty)
         return render(request, "university_portal/faculties/assignment.html",
-                      {"session": request.session, "students": students, "faculties": faculty,
+                      {"session": request.session,
+                       "students": students,
+                       "faculties": faculty,
                        "assignments": assign,
-                       "deadline": assignment, "assignment_posted": assignment_posted,
+                       "deadline": assignment,
+                       "assignment_posted": assignment_posted,
                        "deadline_check": deadline_check})
 
 
@@ -400,26 +416,50 @@ def get_assignments(CourseID, Fname):
 
 def get_grades(aid, Deadline, Fname):
     conn = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
-    cur = conn.cursor()
-    cur1 = conn.cursor()
-    cur2 = conn.cursor()
-    statement = "UPDATE fac_submit SET deadline_date= \'" + Deadline + "\' WHERE aid= \'" + aid + "\' and FID = (select fid from faculties where fname =\'" + \
-                Fname[1] + "\')"
-    statement1 = "SELECT DISTINCT AID from fac_submit WHERE deadline_date IS NOT NULL "
-    statement2 = "SELECT DISTINCT s.SNAME, s.SID from students s, enroll e, assignments a, fac_submit f" \
-                 " WHERE s.sid = e.sid AND e.cid = a.cid AND a.aid = f.aid" \
-                 " AND f.aid=\'" + aid + "\' AND deadline_date IS NOT NULL"
-    cur.execute(statement)
-    conn.commit()
-    statement = "SELECT DISTINCT deadline_date, aid FROM fac_submit WHERE FID = (select fid from faculties where fname =\'" + \
-                Fname[1] + "\') and deadline_date is not NULL"
-    cur.execute(statement)
-    cur1.execute(statement1)
-    cur2.execute(statement2)
-    rs = cur.fetchall()
-    rs1 = cur1.fetchall()
-    rs2 = cur2.fetchall()
-    return rs, rs2, rs1
+    if aid is not None and Deadline is not None:
+        cur = conn.cursor()
+        cur1 = conn.cursor()
+        cur2 = conn.cursor()
+        statement = "UPDATE fac_submit SET deadline_date= \'" + Deadline + "\' WHERE aid= \'" + aid + "\' and FID = (select fid from faculties where fname =\'" + \
+                    Fname[1] + "\')"
+        statement1 = "SELECT DISTINCT AID from fac_submit WHERE deadline_date IS NOT NULL "
+        statement2 = "SELECT DISTINCT s.SNAME, s.SID, ss.grade from students s, enroll e, assignments a, fac_submit f, stu_submit ss" \
+                     " WHERE s.sid = e.sid AND s.sid = ss.sid AND e.cid = a.cid AND a.aid = f.aid" \
+                     " AND f.aid=\'" + aid + "\' AND deadline_date IS NOT NULL"
+        cur.execute(statement)
+        conn.commit()
+        statement = "SELECT DISTINCT deadline_date, aid FROM fac_submit WHERE FID = (select fid from faculties where fname =\'" + \
+                    Fname[1] + "\') and deadline_date is not NULL"
+        cur.execute(statement)
+        cur1.execute(statement1)
+        cur2.execute(statement2)
+        rs = cur.fetchall()
+        rs1 = cur1.fetchall()
+        rs2 = cur2.fetchall()
+        return rs, rs2, rs1
+    elif aid is None and Deadline is None:
+        cur1 = conn.cursor()
+        statement1 = "SELECT DISTINCT deadline_date, aid FROM fac_submit WHERE FID =  \'" + Fname[0] + "\'"
+        cur1.execute(statement1)
+        assign_with_deadlines = cur1.fetchall()
+        cur1.close()
+
+        print("AWD", assign_with_deadlines)
+
+        cur2 = conn.cursor()
+        statement2 = "SELECT DISTINCT s.SNAME, s.SID, ss.grade from students s, enroll e, assignments a, fac_submit f,  stu_submit ss" \
+                     " WHERE s.sid = e.sid AND s.sid = ss.sid AND e.cid = a.cid AND a.aid = f.aid" \
+                     " AND f.fid=\'" + Fname[0] + "\' AND deadline_date IS NOT NULL"
+        cur2.execute(statement2)
+        students_with_grades = cur2.fetchall()
+        cur2.close()
+
+        cur3 = conn.cursor()
+        statement3 = "SELECT DISTINCT AID from fac_submit WHERE deadline_date IS NOT NULL  and fid =\'"+Fname[0]+"\'"
+        cur3.execute(statement3)
+        fac_submitted_assignments = cur3.fetchall()
+        cur3.close()
+        return assign_with_deadlines, students_with_grades, fac_submitted_assignments
 
 
 def set_stu_grade(stu_grades, stu_id, aid):
