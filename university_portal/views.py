@@ -5,7 +5,7 @@ from datetime import datetime
 # Database connection parameters
 
 USER = 'root'
-PASSWORD = 'root123'
+PASSWORD = 'Sulphur@1234'
 HOST = '127.0.0.1'
 DATABASE = 'ssdi_project'
 
@@ -84,14 +84,17 @@ def profile(request):
     if request.session['type'] == 'S':
         return render(request, "university_portal/student/profile.html", {"session": request.session})
     elif request.session['type'] == 'F':
-        pass
-    return render(request, "university_portal/login.html", {})
+        return render(request, "university_portal/faculties/fac_profile.html", {"session": request.session})
 
 
 def update_password(request):
-    if 'username' not in request.session:
-        return start(request)
-    return render(request, "university_portal/update_password.html", {"session": request.session})
+    if 'username' in request.session:
+        if 'type' in request.session:
+            if request.session['type'] == 'S':
+                return render(request, "university_portal/student/update_password.html", {"session": request.session})
+            elif request.session['type'] == 'F':
+                return render(request, "university_portal/faculties/update_password.html", {"session": request.session})
+    return render(request, 'university_portal/login.html', {})
 
 
 def update(request):
@@ -118,16 +121,16 @@ def update(request):
                     rs = cur.fetchone()
                     con.commit()
                     request.session['student'] = get_student(request.session['username'])
-                    return render(request, "university_portal/update_password.html",
+                    return render(request, "university_portal/student/update_password.html",
                                   {"session": request.session,
                                    "updated": True})
                 else:
-                    return render(request, "university_portal/update_password.html",
+                    return render(request, "university_portal/student/update_password.html",
                                   {"session": request.session,
                                    "updated": False})
 
             else:
-                return render(request, "university_portal/update_password.html",
+                return render(request, "university_portal/student/update_password.html",
                               {"session": request.session,
                                "updated": False})
 
@@ -153,7 +156,72 @@ def update(request):
         return start(request)
 
 
-# student views
+def fac_profile_update(request):
+    print(request)
+    if 'username' not in request.session:
+        return start(request)
+
+    if 'update' in request.POST:
+        upd_type = request.POST['update']
+
+        if upd_type == 'password':
+            con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+            cur = con.cursor()
+            statement = "SELECT pwd FROM login WHERE email=\'" \
+                        + request.session['username'] + "\'"
+            cur.execute(statement)
+            rs = cur.fetchone()
+
+            con.close()
+            if request.POST['oldpwd'] == rs[0]:
+                if request.POST['newpwd'] == request.POST['cnfpwd']:
+                    con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+                    cur = con.cursor()
+                    statement = "UPDATE login SET pwd=\'" + request.POST['newpwd'] + "\' WHERE email=\'" + \
+                                request.session[
+                                    'username'] + "\'"
+                    cur.execute(statement)
+                    rs = cur.fetchone()
+                    con.commit()
+                    # request.session['faculty'] = get_faculty(request.session['username'])
+
+                    return render(request, "university_portal/faculties/update_password.html",
+                                  {"session": request.session,
+                                   "updated": True})
+                else:
+
+                    return render(request, "university_portal/faculties/update_password.html",
+                                  {"session": request.session,
+                                   "updated": False})
+
+            else:
+
+                return render(request, "university_portal/faculties/update_password.html",
+                              {"session": request.session,
+                               "updated": False})
+
+        elif upd_type == 'profile':
+
+            con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+            cur = con.cursor()
+            statement = "UPDATE faculties SET Phone_Number=\'" + request.POST['FacPhNo'] + "\', Office=\'" + \
+                        request.POST['fac_office'] + "\' WHERE Email=\'" + request.session[
+                            'username'] + "\'"
+            cur.execute(statement)
+            rs = cur.fetchone()
+            con.commit()
+            request.session['faculty'] = get_faculty(request.session['username'])
+            con.close()
+            return render(request, "university_portal/faculties/fac_profile.html",
+                          {"session": request.session,
+                           "updated": True})
+        else:
+            return render(request, "university_portal/faculties/fac_profile.html",
+                          {"session": request.session,
+                           "updated": False})
+    else:
+        return start(request)
+
 
 def assignments_stu(request):
     if 'username' not in request.session:
