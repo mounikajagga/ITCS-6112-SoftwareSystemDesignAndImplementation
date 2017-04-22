@@ -103,24 +103,16 @@
 
                     <tbody>
                     {% for all in assignments %}
-                        <form action="grades" method="get">
-                            <tr>
 
+                        <tr>
+                            <form action="grades" method="GET">
                                 <input type="hidden" name="CourseID" value="{{ all.1 }}"/>
                                 <td>{{ all.0 }}</td>
                                 <td>{{ all.1 }}</td>
                                 <td>{{ all.2 }}</td>
                                 <td><input type="date" name="Deadline" required="true"/></td>
-                                {% if all.0 == assignment_posted.0.0 or all.0 == assignment_posted.1.0 %}
-                                    <td>
-                                        <button type="submit" class="btn btn-xs btn-info" disabled>
-                                            <span class="glyphicon glyphicon-send" data-toggle="tooltip"
-                                                  title="Post"></span>&nbsp;
-                                            <input type="hidden" name="grade_count" value='0'>
-                                            <input type="hidden" name="aid" value="{{ all.0 }}"/>
-                                        </button>
-                                        {% else %}
-                                    </td>
+
+                                {% if all.0 != assignment_posted.0.0 and all.0 != assignment_posted.1.0 %}
                                     <td>
                                         <button type="submit" class="btn btn-xs btn-info">
                                             <span class="glyphicon glyphicon-send" data-toggle="tooltip"
@@ -128,9 +120,17 @@
                                             <input type="hidden" name="aid" value="{{ all.0 }}"/>
                                         </button>
                                     </td>
+                                {% else %}
+                                    <td>
+                                        <button type="submit" class="btn btn-xs btn-info" disabled>
+                                            <span class="glyphicon glyphicon-send" data-toggle="tooltip"
+                                                  title="Post"></span>&nbsp;
+                                            <input type="hidden" name="aid" value="{{ all.0 }}"/>
+                                        </button>
+                                    </td>
                                 {% endif %}
-                            </tr>
-                        </form>
+                            </form>
+                        </tr>
                     {% endfor %}
                     </tbody>
                 </table>
@@ -139,7 +139,7 @@
 
         <div id="Grades" class="tab-pane fade">
 
-            {% if deadline is empty %}
+            {% if deadline_check.0 is empty %}
                 <h1>You have not posted anything</h1>
             {% else %}
                 <h4>Hello !!!!
@@ -176,7 +176,11 @@
                                     <td>
                                         {{ stu.1 }}
                                     </td>
-                                    <td></td>
+                                    {% if deadline.0.1 == all.0 %}
+                                        <td>{{ deadline.0.0|date:"SHORT_DATE_FORMAT" }}</td>
+                                    {% else %}
+                                        <td>{{ deadline.1.0|date:"SHORT_DATE_FORMAT" }}</td>
+                                    {% endif %}
                                     <form action="student_grade" method="GET">
                                         <td>
                                             <select name="grade_assign">
@@ -189,7 +193,7 @@
                                         </td>
                                         <td>
                                             <input type="hidden" name="stu_id" value="{{ stu.1 }}"/>
-                                            <input type="hidden" name="aid" value="{{ all.0 }}" />
+                                            <input type="hidden" name="aid" value="{{ all.0 }}"/>
                                             <button type="submit" class="btn-info btn-xs"><span
                                                     class="glyphicon glyphicon-ok"></span></button>
                                         </td>
