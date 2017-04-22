@@ -87,7 +87,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ssdi_project',
         'USER': 'root',
-        'PASSWORD': 'root123',
+        'PASSWORD': 'Sulphur@1234',
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     }
