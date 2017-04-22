@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^profile$', views.profile, name="profile"),
     url(r'^update$', views.update, name="update"),
     url(r'^update_password$', views.update_password, name='update_password'),
+    url(r'^fac_profile_update$', views.fac_profile_update, name="fac_profile_update"),
 
     # student
     url(r'^assignments_stu', views.assignments_stu, name='assignments_stu'),

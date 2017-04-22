@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Profile: {{ session.student.0 }} </title>
+    <title>Profile: {{ session.faculty.1 }} </title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -21,7 +21,7 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li class="active dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                <span class="glyphicon glyphicon-user"></span> {{ session.student.0 }} <span class="caret"/></a>
+                <span class="glyphicon glyphicon-user"></span> {{ session.faculty.1 }} <span class="caret"/></a>
                 <ul class="dropdown-menu">
                     <li><a href="/update_password">Update Password</a></li>
                 </ul>
@@ -34,7 +34,7 @@
     <div class="row">
         <div class="col-sm-3"></div>
         <div class="col-sm-6">
-            <h2>Hi, {{ session.student.0 }}!</h2>
+            <h2>Hi, {{ session.faculty.1 }}!</h2>
             <h4>Your Profile! </h4>
             <br><br>
              {% if updated %}
@@ -54,42 +54,37 @@
                     </div>
                 </div>
             {% endif %}
-            <form action="/update" method="POST" class="form-horizontal">{% csrf_token %}
+            <form action="/fac_profile_update" method="POST" class="form-horizontal">{% csrf_token %}
                 <input type="hidden" name="update" value="profile"/>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="studentID">Student
+                    <label class="control-label col-sm-2" for="fac1_ID">Faculty
                         ID:</label>
                     <div class="col-sm-6">
-                        <input type="text" class="form-control" id="studentID" name="studentID"
-                               value="{{ session.student.1 }}" disabled>
+                        <input type="text" class="form-control" id="fac_ID" name="fac_ID"
+                               value="{{ session.faculty.0 }}" disabled>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="FacPhNo">Phone:</label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" id="FacPhNo" name="FacPhNo"
+                               value="{{ session.faculty.2 }}">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="semester">Semester:</label>
+                    <label class="control-label col-sm-2" for="fac_email">Email:</label>
                     <div class="col-sm-6">
-                        <input type="text" class="form-control" id="semester" name="semester"
-                               value="{{ session.student.3 }}" disabled>
+                        <input type="email" class="form-control" id="fac_email" name="fac_email"
+                               value="{{ session.faculty.5 }}" disabled>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="stuPhNo">Phone:</label>
+                    <label class="control-label col-sm-2" for="fac_office">Office:</label>
                     <div class="col-sm-6">
-                        <input type="text" class="form-control" id="stuPhNo" name="stuPhNo"
-                               value="{{ session.student.2 }}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-sm-2" for="email">Email:</label>
-                    <div class="col-sm-6">
-                        <input type="email" class="form-control" id="email" name="email"
-                               value="{{ session.student.5 }}" disabled>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-sm-2" for="address">Address:</label>
-                    <div class="col-sm-6">
-							<textarea class="form-control" id="address" name="address"
-                            >{{ session.student.4 }}</textarea>
+							<textarea class="form-control" id="fac_office" name="fac_office"
+                            >{{ session.faculty.3 }}</textarea>
                     </div>
                 </div>
                 <div class="form-group">
