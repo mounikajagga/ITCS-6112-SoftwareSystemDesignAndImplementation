@@ -25,7 +25,7 @@ urlpatterns = [
 
     # faculty
     url(r'^assignments', views.assignments, name='assignments'),
-    url(r'^grades', views.grades, name='grades'),
+    url(r'^post_assignment', views.post_assignment, name='post_assignment'),
     url(r'^student_grade', views.student_grade, name='student_grade'),
 
     # miscellaneous

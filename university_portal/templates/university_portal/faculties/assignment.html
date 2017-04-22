@@ -70,11 +70,11 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for all in assignments %}
+                    {% for assignment in all_course_assignments %}
                         <tr>
-                            <td>{{ all.0 }}</td>
-                            <td>{{ all.1 }}</td>
-                            <td>{{ all.2 }}</td>
+                            <td>{{ assignment.0 }}</td>
+                            <td>{{ assignment.1 }}</td>
+                            <td>{{ assignment.2 }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -103,22 +103,22 @@
                     </thead>
 
                     <tbody>
-                    {% for all in assignments %}
-                        <form action="grades" method="get">
+                    {% for assignment in all_course_assignments %}
+                        <form action="post_assignment" method="get">
                             <tr>
 
                                 <input type="hidden" name="CourseID" value="{{ all.1 }}"/>
-                                <td>{{ all.0 }}</td>
-                                <td>{{ all.1 }}</td>
-                                <td>{{ all.2 }}</td>
+                                <td>{{ assignment.0 }}</td>
+                                <td>{{ assignment.1 }}</td>
+                                <td>{{ assignment.2 }}</td>
                                 <td><input type="date" name="Deadline" required="true"/></td>
-                                {% if all.0 == assignment_posted.0.0 or all.0 == assignment_posted.1.0 %}
+                                {% if assignment.0 in fac_submitted_aid %}
                                     <td>
                                         <button type="submit" class="btn btn-xs btn-info" disabled>
                                             <span class="glyphicon glyphicon-send" data-toggle="tooltip"
                                                   title="Post"></span>&nbsp;
                                             <input type="hidden" name="grade_count" value='0'>
-                                            <input type="hidden" name="aid" value="{{ all.0 }}"/>
+                                            <input type="hidden" name="aid" value="{{ assignment.0 }}"/>
                                         </button>
                                         {% else %}
                                     </td>
@@ -126,7 +126,7 @@
                                         <button type="submit" class="btn btn-xs btn-info">
                                             <span class="glyphicon glyphicon-send" data-toggle="tooltip"
                                                   title="Post"></span>&nbsp;
-                                            <input type="hidden" name="aid" value="{{ all.0 }}"/>
+                                            <input type="hidden" name="aid" value="{{ assignment.0 }}"/>
                                         </button>
                                     </td>
                                 {% endif %}
@@ -139,24 +139,22 @@
         </div>
 
         <div id="Grades" class="tab-pane fade">
-
-            {% if deadline is empty %}
+            {% if not fac_submitted_aid %}
                 <h1>You have not posted anything</h1>
             {% else %}
-                <h4>Hello !!!!
-                    <mark><strong><i>{{ session.faculty.1 }}</i></strong></mark>
+                <h4>
                     Below are the details of your assignment:
                 </h4>
-                {% for all in assignment_posted %}
+                {% for aid in fac_submitted_aid %}
                     <div class="panel panel-info">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" href="#Assignment{{ all.0 }}">Assignment - {{ all.0 }}</a>
+                                <a data-toggle="collapse" href="#Assignment{{ aid }}">Assignment - {{ aid }}</a>
                             </h4>
                         </div>
                     </div>
 
-                    <div id="Assignment{{ all.0 }}" class="panel-collapse collapse">
+                    <div id="Assignment{{ aid }}" class="panel-collapse collapse">
                         <table class="table table-striped">
 
                             <thead>
@@ -169,40 +167,42 @@
                             </thead>
                             <tbody>
                             <tr>
-                                {% for stu in students %}
-                                    <td>
-                                        {{ stu.0 }}
-                                    </td>
-                                    <td>
-                                        {{ stu.1 }}
-                                    </td>
-                                    <td>
-                                    {% if deadline.0.1 == all.0 %}
-                                        {{ deadline.0.0|date:"SHORT_DATE_FORMAT" }}
-                                    {% else %}
-                                        {{ deadline.1.0|date:"SHORT_DATE_FORMAT" }}
-                                    {% endif %}
-                                    </td>
-                                    <form action="student_grade" method="GET">
+                                {% for stu in aid_studentsList.aidKey %}
+                                    {% if stu.3 == aid %}
                                         <td>
-                                            <select name="grade_assign" style="width:60px;">
-                                                <option>{{ stu.2 }}</option>
-                                                <option value="stu_grade">----</option>
-                                                <option value="A">A</option>
-                                                <option value="B">B</option>
-                                                <option value="C">C</option>
-                                                <option value="D">D</option>
-                                            </select>
-
-
-                                            <input type="hidden" name="stu_id" value="{{ stu.1 }}"/>
-                                            <input type="hidden" name="aid" value="{{ all.0 }}" />
-                                            <button type="submit" class="btn-info btn-xs"><span
-                                                    class="glyphicon glyphicon-ok"></span></button>
+                                            {{ stu.0 }}
                                         </td>
-                                    </form>
-                                    </td>
-                                    </tr>
+                                        <td>
+                                            {{ stu.1 }}
+                                        </td>
+                                        <td>
+                                            {% if deadline.0.1 == all.0 %}
+                                                {{ deadline.0.0|date:"SHORT_DATE_FORMAT" }}
+                                            {% else %}
+                                                {{ deadline.1.0|date:"SHORT_DATE_FORMAT" }}
+                                            {% endif %}
+                                        </td>
+                                        <form action="student_grade" method="GET">
+                                            <td>
+                                                <select name="grade_assign" style="width:60px;">
+                                                    <option>{{ stu.2 }}</option>
+                                                    <option value="stu_grade">----</option>
+                                                    <option value="A">A</option>
+                                                    <option value="B">B</option>
+                                                    <option value="C">C</option>
+                                                    <option value="D">D</option>
+                                                </select>
+
+
+                                                <input type="hidden" name="stu_id" value="{{ stu.1 }}"/>
+                                                <input type="hidden" name="aid" value="{{ all.0 }}"/>
+                                                <button type="submit" class="btn-info btn-xs"><span
+                                                        class="glyphicon glyphicon-ok"></span></button>
+                                            </td>
+                                        </form>
+                                        </td>
+                                        </tr>
+                                    {% endif %}
                                 {% endfor %}
                             </tbody>
                         </table>
