@@ -1,6 +1,5 @@
 from django.shortcuts import render
 import MySQLdb
-from datetime import datetime
 
 # Database connection parameters
 
@@ -226,11 +225,12 @@ def assignments_stu(request):
     if 'username' not in request.session:
         return render(request, "university_portal/login.html", {})
 
-    if 'courseId' not in request.GET:
+    if 'courseId' not in request.session:
+        request.session['courseId'] = request.GET['courseId']
         return render(request, "university_portal/student/welcome.html", {"session": request.session})
 
-    all_assignments = get_all_posted_assignments(request.GET['courseId'], request.session['student'][1])
-    submitted_assignments = get_submitted_assignments(request.GET['courseId'], request.session['student'][1])
+    all_assignments = get_all_posted_assignments(request.session['courseId'], request.session['student'][1])
+    submitted_assignments = get_submitted_assignments(request.session['courseId'], request.session['student'][1])
     due_assignments = get_due_assignments(all_assignments, submitted_assignments)
 
     return render(request, "university_portal/student/assignments.html",
@@ -241,7 +241,19 @@ def assignments_stu(request):
 
 
 def assignment_submit(request):
-    pass
+    if 'username' not in request.session:
+        return render(request, "university_portal/login.html", {})
+
+    con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+    cur = con.cursor()
+    statement = "INSERT INTO stu_submit (aid, sid, date_of_submission)" \
+                " VALUES (\'" + request.POST['aid'] + "\', \'" + request.POST['sid'] + "\', CURDATE())"
+    cur.execute(statement)
+    con.commit()
+
+    return assignments_stu(request)
+
+
 
 # faculties views
 # ##### - Ishan
@@ -262,8 +274,8 @@ def assignments(request):
 
         fac_submitted_aid = retrieve_aid(fac_submitted_assignments)
 
-        aid_studentsList = []
         # get students for a assignment
+        aid_studentsList = []
         for aid in fac_submitted_aid:
             aid_studentsList.extend(get_students_with_assignment(aid, faculty[0]))
 
@@ -286,7 +298,8 @@ def post_assignment(request):
         conn = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
         cur = conn.cursor()
         statement = "UPDATE fac_submit SET deadline_date= \'" + deadline + "\'" \
-                    " WHERE aid= \'" + aid + "\' and FID = \'" + faculty[0] + "\'"
+                    " WHERE aid= \'" + aid + "\'" \
+                    " AND FID = \'" + faculty[0] + "\'"
         cur.execute(statement)
         conn.commit()
 
@@ -302,8 +315,6 @@ def student_grade(request):
 
 
 ###### - Ishan
-
-
 
 # ------------------------------------
 # Views End
@@ -339,8 +350,14 @@ def get_courses_stu(username):
 def get_all_posted_assignments(courseid, sid):
     con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = con.cursor()
-    statement = "SELECT aid, fid, deadline_date FROM fac_submit WHERE fid IN ( " \
-                "SELECT fid FROM teaches WHERE cid=\'" + courseid + "\')"
+    statement = "SELECT fs.aid, fs.fid, fs.deadline_date" \
+                " FROM fac_submit fs" \
+                " WHERE fs.fid ="\
+                " (SELECT fid" \
+                " FROM enroll" \
+                " WHERE cid=\'" + courseid + "\'"\
+                " AND sid=\'" + sid + "\')"
+
     cur.execute(statement)
     all_assignments = cur.fetchall()
     con.close()
@@ -350,9 +367,12 @@ def get_all_posted_assignments(courseid, sid):
 def get_submitted_assignments(courseid, sid):
     con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = con.cursor()
-    statement = "SELECT DISTINCT s.aid, s.date_of_submission, s.grade FROM stu_submit s " \
-                "WHERE sid = \'" + sid + "\' AND s.aid IN" \
-                                         "(SELECT DISTINCT aid FROM assignments WHERE cid=\'" + courseid + "\')"
+    statement = "SELECT s.aid, s.date_of_submission, s.grade" \
+                " FROM stu_submit s " \
+                " WHERE sid = \'" + sid + "\'" \
+                " AND s.aid IN" \
+                " (SELECT aid FROM fac_submit WHERE fid = " \
+                " (SELECT fid from enroll WHERE cid = \'" + courseid + "\' AND sid = \'" + sid + "\'))"
 
     cur.execute(statement)
     submitted_assignments = cur.fetchall()
@@ -362,7 +382,9 @@ def get_submitted_assignments(courseid, sid):
 
 def get_due_assignments(fac_assignments, submitted_assignments):
     due_assignments = []
-
+    print("here")
+    print(fac_assignments)
+    print(submitted_assignments)
     for assignment in fac_assignments:
         exist = False
         for stu_assignment in submitted_assignments:
@@ -422,7 +444,7 @@ def get_fac_submitted_assignments(cid, fid):
 
 
 def retrieve_aid(fac_submitted_assignments):
-    aid =[]
+    aid = []
     for assignment in fac_submitted_assignments:
         aid.append(assignment[0])
 
@@ -432,9 +454,10 @@ def retrieve_aid(fac_submitted_assignments):
 def get_students_with_assignment(aid, fid):
     conn = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = conn.cursor()
-    statement = "SELECT DISTINCT s.SNAME, s.SID, ss.grade, a.aid, f.deadline_date from students s, enroll e, assignments a, fac_submit f,  stu_submit ss" \
-    " WHERE s.sid = e.sid AND s.sid = ss.sid AND ss.aid = a.aid AND e.cid = a.cid AND a.aid = f.aid" \
-    " AND f.fid=\'" + fid + "\' AND deadline_date IS NOT NULL AND f.aid = \'" + aid + "\'"
+    statement = "SELECT DISTINCT s.SNAME, s.SID, ss.grade, a.aid, f.deadline_date" \
+                " from students s, enroll e, assignments a, fac_submit f,  stu_submit ss" \
+                " WHERE s.sid = e.sid AND s.sid = ss.sid AND ss.aid = a.aid AND e.cid = a.cid AND a.aid = f.aid" \
+                " AND f.fid=\'" + fid + "\' AND deadline_date IS NOT NULL AND f.aid = \'" + aid + "\'"
     cur.execute(statement)
 
     students_with_assignment = list(cur.fetchall())

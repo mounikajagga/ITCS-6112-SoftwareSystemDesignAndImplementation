@@ -61,11 +61,13 @@
                             </thead>
                             <tbody>
                             {% for aid, fid, deadline in  due_assignments %}
-                                <form action="assignment_submit" method="post">
-                                    <input type="hidden" name="aid" value="{{ aid }}_{{ session.student.1 }}"/>
+                                <form action="assignment_submit" method="post">{% csrf_token %}
+                                    <input type="hidden" name="file" value="{{ aid }}_{{ session.student.1 }}"/>
+                                    <input type="hidden" name="aid" value="{{ aid }}"/>
+                                    <input type="hidden" name="sid" value="{{ session.student.1 }}"/>
                                     <tr>
                                         <td>{{ aid }}</td>
-                                        <td>{{ deadline }}</td>
+                                        <td>{{ deadline }}{{ grade }}</td>
                                         <td>
                                             <span class="btn btn-default btn-file">
                                                 <input type="file" name="assign_file">
@@ -89,24 +91,28 @@
 
                 <div id="sub" class="tab-pane fade">
                     <h3>Submitted Assignments</h3>
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>Assignment</th>
-                            <th>Date Submitted</th>
-                            <th>Grade</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for aid, dos, grade in submitted_assignments %}
+                    {% if submitted_assignments %}
+                        <table class="table">
+                            <thead>
                             <tr>
-                                <td>{{ aid }}</td>
-                                <td>{{ dos }}</td>
-                                <td>{{ grade }}</td>
+                                <th>Assignment</th>
+                                <th>Date Submitted</th>
+                                <th>Grade</th>
                             </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {% for aid, dos, grade in submitted_assignments %}
+                                <tr>
+                                    <td>{{ aid }}</td>
+                                    <td>{{ dos }}</td>
+                                    <td>{{ grade }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>Oh! No submitted assignments!</p>
+                    {% endif %}
                 </div>
 
                 <div id="all" class="tab-pane fade">
@@ -115,14 +121,14 @@
                         <thead>
                         <tr>
                             <th>Assignment</th>
-                            <th>Grade</th>
+                            <th>Deadline</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {% for key, value, grade in all_assignments %}
+                        {% for aid, fid, deadline in all_assignments %}
                             <tr>
-                                <td>{{ key }}</td>
-                                <td>{{ value }}</td>
+                                <td>{{ aid }}</td>
+                                <td>{{ deadline }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
