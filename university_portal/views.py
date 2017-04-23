@@ -382,9 +382,6 @@ def get_submitted_assignments(courseid, sid):
 
 def get_due_assignments(fac_assignments, submitted_assignments):
     due_assignments = []
-    print("here")
-    print(fac_assignments)
-    print(submitted_assignments)
     for assignment in fac_assignments:
         exist = False
         for stu_assignment in submitted_assignments:
