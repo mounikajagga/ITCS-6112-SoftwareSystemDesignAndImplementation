@@ -1,5 +1,7 @@
 from django.shortcuts import render
 import MySQLdb
+import os
+from django.core.files.storage import FileSystemStorage
 
 # Database connection parameters
 
@@ -243,6 +245,11 @@ def assignments_stu(request):
 def assignment_submit(request):
     if 'username' not in request.session:
         return render(request, "university_portal/login.html", {})
+
+    assignment_file = request.FILES['assign_file']
+    fileExtension = os.path.splitext(assignment_file.name)[1]
+    fs = FileSystemStorage()
+    fs.save("assignments/"+request.POST['file']+""+fileExtension, assignment_file)
 
     con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = con.cursor()

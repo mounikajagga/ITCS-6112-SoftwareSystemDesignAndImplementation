@@ -61,7 +61,7 @@
                             </thead>
                             <tbody>
                             {% for aid, fid, deadline in  due_assignments %}
-                                <form action="assignment_submit" method="post">{% csrf_token %}
+                                <form action="assignment_submit" method="post" enctype="multipart/form-data">{% csrf_token %}
                                     <input type="hidden" name="file" value="{{ aid }}_{{ session.student.1 }}"/>
                                     <input type="hidden" name="aid" value="{{ aid }}"/>
                                     <input type="hidden" name="sid" value="{{ session.student.1 }}"/>
@@ -70,7 +70,7 @@
                                         <td>{{ deadline }}{{ grade }}</td>
                                         <td>
                                             <span class="btn btn-default btn-file">
-                                                <input type="file" name="assign_file">
+                                                <input type="file" name="assign_file" enctype="multipart/form-data">
                                             </span>
                                         </td>
                                         <td>
