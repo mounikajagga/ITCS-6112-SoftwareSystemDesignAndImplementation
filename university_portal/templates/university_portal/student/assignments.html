@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/Style.css"/>
 </head>
 
 <body>
@@ -61,7 +62,8 @@
                             </thead>
                             <tbody>
                             {% for aid, fid, deadline in  due_assignments %}
-                                <form action="assignment_submit" method="post" enctype="multipart/form-data">{% csrf_token %}
+                                <form action="assignment_submit" method="post"
+                                      enctype="multipart/form-data">{% csrf_token %}
                                     <input type="hidden" name="file" value="{{ aid }}_{{ session.student.1 }}"/>
                                     <input type="hidden" name="aid" value="{{ aid }}"/>
                                     <input type="hidden" name="sid" value="{{ session.student.1 }}"/>
@@ -139,6 +141,11 @@
         <div class="col-sm-3"></div>
     </div>
 </div>
+<footer class="navbar navbar-default navbar-fixed-bottom">
+    <div class="container">
+        <span class="text-muted">University Portal developed in course of ITCS6112.</span>
+    </div>
+</footer>
 </body>
 
 </html>

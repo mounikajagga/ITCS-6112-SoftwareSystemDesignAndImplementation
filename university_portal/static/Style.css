@@ -6,7 +6,21 @@
 .navbar-brand{
     font-family: 'Satisfy', cursive;
 }
+body > .container{
+    padding-top: 60px;
+}
 
-body{
-    background-image: url("h");
+.push {
+
+    height: 60px;
+}
+.text-muted{
+    margin: auto;
+}
+footer{
+    text-align: center;
+
+}
+footer > div{
+    padding-top: 15px;
 }

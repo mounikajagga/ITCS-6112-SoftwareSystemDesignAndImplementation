@@ -40,174 +40,181 @@
         </div>
     </div>
 </nav>
+<div class="container">
+    <div class="col-sm-3"></div>
+    <div class="col-sm-6">
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#All">All</a></li>
+            <li><a data-toggle="tab" href="#Grades">Grading</a></li>
+        </ul>
 
-<div class="col-sm-3"></div>
-<div class="col-sm-6">
-    <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#All">All</a></li>
-        <li><a data-toggle="tab" href="#Grades">Grading</a></li>
-    </ul>
+        <br>
 
-    <br>
-
-    <div class="tab-content">
-        <div id="All" class="tab-pane fade in active">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" href="#panel1">Assignments</a>
-                    </h4>
+        <div class="tab-content">
+            <div id="All" class="tab-pane fade in active">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" href="#panel1">Assignments</a>
+                        </h4>
+                    </div>
                 </div>
-            </div>
 
-            <div id="panel1" class="panel-collapse collapse in">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Assignments</th>
-                        <th>Course ID</th>
-                        <th>Course Name</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for assignment in all_course_assignments %}
+                <div id="panel1" class="panel-collapse collapse in">
+                    <table class="table table-striped">
+                        <thead>
                         <tr>
-                            <td>{{ assignment.0 }}</td>
-                            <td>{{ assignment.1 }}</td>
-                            <td>{{ assignment.2 }}</td>
+                            <th>Assignments</th>
+                            <th>Course ID</th>
+                            <th>Course Name</th>
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" href="#panel2">Post Assignments</a>
-                    </h4>
-                </div>
-            </div>
-
-            <div id="panel2" class="panel-collapse collapse">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Assignments</th>
-                        <th>CourseID</th>
-                        <th>Course Name</th>
-                        <th>Deadline</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    {% for assignment in all_course_assignments %}
-                        <form action="post_assignment" method="get">
+                        </thead>
+                        <tbody>
+                        {% for assignment in all_course_assignments %}
                             <tr>
-
-                                <input type="hidden" name="CourseID" value="{{ all.1 }}"/>
                                 <td>{{ assignment.0 }}</td>
                                 <td>{{ assignment.1 }}</td>
                                 <td>{{ assignment.2 }}</td>
-                                <td><input type="date" name="Deadline" required="true"/></td>
-                                {% if assignment.0 in fac_submitted_aid %}
-                                    <td>
-                                        <button type="submit" class="btn btn-xs btn-info" disabled>
-                                            <span class="glyphicon glyphicon-send" data-toggle="tooltip"
-                                                  title="Post"></span>&nbsp;
-                                            <input type="hidden" name="grade_count" value='0'>
-                                            <input type="hidden" name="aid" value="{{ assignment.0 }}"/>
-                                        </button>
-                                        {% else %}
-                                    </td>
-                                    <td>
-                                        <button type="submit" class="btn btn-xs btn-info">
-                                            <span class="glyphicon glyphicon-send" data-toggle="tooltip"
-                                                  title="Post"></span>&nbsp;
-                                            <input type="hidden" name="aid" value="{{ assignment.0 }}"/>
-                                        </button>
-                                    </td>
-                                {% endif %}
                             </tr>
-                        </form>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
 
-        <div id="Grades" class="tab-pane fade">
-            {% if not fac_submitted_aid %}
-                <h1>You have not posted anything</h1>
-            {% else %}
-                <h4>
-                    Below are the details of your assignment:
-                </h4>
-                {% for aid in fac_submitted_aid %}
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" href="#Assignment{{ aid }}">Assignment - {{ aid }}</a>
-                            </h4>
-                        </div>
+
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" href="#panel2">Post Assignments</a>
+                        </h4>
                     </div>
+                </div>
 
-                    <div id="Assignment{{ aid }}" class="panel-collapse collapse">
-                        <table class="table table-striped">
+                <div id="panel2" class="panel-collapse collapse">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Assignments</th>
+                            <th>CourseID</th>
+                            <th>Course Name</th>
+                            <th>Deadline</th>
+                            <th></th>
+                        </tr>
+                        </thead>
 
-                            <thead>
-                            <tr>
-                                <th>Students</th>
-                                <th>Students ID</th>
-                                <th>Deadline</th>
-                                <th>Grade</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                {% for stu in aid_studentsList %}
+                        <tbody>
+                        {% for assignment in all_course_assignments %}
+                            <form action="post_assignment" method="get">
+                                <tr>
 
-                                    {% if stu.3 == aid %}
+                                    <input type="hidden" name="CourseID" value="{{ all.1 }}"/>
+                                    <td>{{ assignment.0 }}</td>
+                                    <td>{{ assignment.1 }}</td>
+                                    <td>{{ assignment.2 }}</td>
+                                    <td><input type="date" name="Deadline" required="true"/></td>
+                                    {% if assignment.0 in fac_submitted_aid %}
                                         <td>
-                                            {{ stu.0 }}
+                                            <button type="submit" class="btn btn-xs btn-info" disabled>
+                                            <span class="glyphicon glyphicon-send" data-toggle="tooltip"
+                                                  title="Post"></span>&nbsp;
+                                                <input type="hidden" name="grade_count" value='0'>
+                                                <input type="hidden" name="aid" value="{{ assignment.0 }}"/>
+                                            </button>
+                                            {% else %}
                                         </td>
                                         <td>
-                                            {{ stu.1 }}
+                                            <button type="submit" class="btn btn-xs btn-info">
+                                            <span class="glyphicon glyphicon-send" data-toggle="tooltip"
+                                                  title="Post"></span>&nbsp;
+                                                <input type="hidden" name="aid" value="{{ assignment.0 }}"/>
+                                            </button>
                                         </td>
-                                        <td>
-                                            {{ stu.4|date:"SHORT_DATE_FORMAT" }}
-                                        </td>
-                                        <form action="student_grade" method="GET">
-                                            <td>
-                                                <select name="grade_assign" style="width:60px;">
-                                                    <option>{{ stu.2 }}</option>
-                                                    <option value="stu_grade">----</option>
-                                                    <option value="A">A</option>
-                                                    <option value="B">B</option>
-                                                    <option value="C">C</option>
-                                                    <option value="D">D</option>
-                                                </select>
-
-
-                                                <input type="hidden" name="stu_id" value="{{ stu.1 }}"/>
-                                                <input type="hidden" name="aid" value="{{ aid }}"/>
-                                                <button type="submit" class="btn-info btn-xs"><span
-                                                        class="glyphicon glyphicon-ok"></span></button>
-                                            </td>
-                                        </form>
-                                        </td>
-                                        </tr>
                                     {% endif %}
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% endfor %}
-            {% endif %}
+                                </tr>
+                            </form>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="Grades" class="tab-pane fade">
+                {% if not fac_submitted_aid %}
+                    <h1>You have not posted anything</h1>
+                {% else %}
+                    <h4>
+                        Below are the details of your assignment:
+                    </h4>
+                    {% for aid in fac_submitted_aid %}
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" href="#Assignment{{ aid }}">Assignment - {{ aid }}</a>
+                                </h4>
+                            </div>
+                        </div>
+
+                        <div id="Assignment{{ aid }}" class="panel-collapse collapse">
+                            <table class="table table-striped">
+
+                                <thead>
+                                <tr>
+                                    <th>Students</th>
+                                    <th>Students ID</th>
+                                    <th>Deadline</th>
+                                    <th>Grade</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    {% for stu in aid_studentsList %}
+
+                                        {% if stu.3 == aid %}
+                                            <td>
+                                                {{ stu.0 }}
+                                            </td>
+                                            <td>
+                                                {{ stu.1 }}
+                                            </td>
+                                            <td>
+                                                {{ stu.4|date:"SHORT_DATE_FORMAT" }}
+                                            </td>
+                                            <form action="student_grade" method="GET">
+                                                <td>
+                                                    <select name="grade_assign" style="width:60px;">
+                                                        <option>{{ stu.2 }}</option>
+                                                        <option value="stu_grade">----</option>
+                                                        <option value="A">A</option>
+                                                        <option value="B">B</option>
+                                                        <option value="C">C</option>
+                                                        <option value="D">D</option>
+                                                    </select>
+
+
+                                                    <input type="hidden" name="stu_id" value="{{ stu.1 }}"/>
+                                                    <input type="hidden" name="aid" value="{{ aid }}"/>
+                                                    <button type="submit" class="btn-info btn-xs"><span
+                                                            class="glyphicon glyphicon-ok"></span></button>
+                                                </td>
+                                            </form>
+                                            </td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
+<div class="push"></div>
+<footer class="navbar navbar-default navbar-fixed-bottom">
+    <div class="container">
+        <span class="text-muted">University Portal developed in course of ITCS6112.</span>
+    </div>
+</footer>
 </body>
 </html>

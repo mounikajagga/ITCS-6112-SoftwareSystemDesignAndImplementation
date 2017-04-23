@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/Style.css"/>
 </head>
 <body>
 <nav class="navbar navbar-default">
@@ -37,7 +38,7 @@
             <h2>Hi, {{ session.student.0 }}!</h2>
             <h4>Your Profile! </h4>
             <br><br>
-             {% if updated %}
+            {% if updated %}
                 <div class="form-group">
                     <div class="alert alert-success alert-dismissable fade in">
                         <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
@@ -46,7 +47,7 @@
                     </div>
                 </div>
             {% elif not updated and updated is not None %}
-                 <div class="form-group">
+                <div class="form-group">
                     <div class="alert alert-danger alert-dismissable fade in">
                         <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
                         <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
@@ -108,5 +109,10 @@
         </div>
     </div>
 </div>
+<footer class="navbar navbar-default navbar-fixed-bottom">
+    <div class="container">
+        <span class="text-muted">University Portal developed in course of ITCS6112.</span>
+    </div>
+</footer>
 </body>
 </html>
