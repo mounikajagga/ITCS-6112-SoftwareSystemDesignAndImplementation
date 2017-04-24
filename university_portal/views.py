@@ -223,6 +223,55 @@ def fac_profile_update(request):
         return start(request)
 
 
+def grade_cal(sid, courseID):
+
+    """con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+    cur = con.cursor()
+    statement = "SELECT sid FROM students WHERE email=\'" \
+                        + request.session['username'] + "\'"
+    cur.execute(statement)
+    rs = cur.fetchone()
+    con.commit()"""
+
+    con1 = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+    cur1 = con1.cursor()
+    statement1 = "SELECT grade FROM stu_submit WHERE sid=\'" \
+                + sid + "\' AND aid IN(SELECT aid FROM assignments WHERE cid=\'"+courseID+"\')"
+    cur1.execute(statement1)
+    rs1 = cur1.fetchall()
+    list_of_grades = list(rs1)
+    len1=len(list_of_grades)
+    con1.commit()
+    grade=0
+    for g in list_of_grades:
+        if g == 'A':
+            grade = (grade + 4)
+        elif g == 'B':
+            grade = (grade + 3)
+        elif g == 'C':
+            grade = (grade + 2)
+        else:
+            grade = (grade + 1)
+    avg= (grade / len1)
+    ovr_grade=''
+    if avg>3.0:
+        ovr_grade = 'A'
+    elif avg>2:
+        ovr_grade = 'B'
+    elif avg>1:
+        ovr_grade = 'C'
+    else:
+        ovr_grade = 'D'
+    con2 = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
+    cur2 = con2.cursor()
+    statement2 = "UPDATE enroll SET overall_grades=\'" + ovr_grade + "\' WHERE sid=\'" \
+                + sid + "\' AND cid=\'"+courseID+"\')"
+    cur2.execute(statement2)
+    rs2 = cur2.fetchall()
+    con2.commit()
+    return
+
+
 def assignments_stu(request):
     if 'username' not in request.session:
         return render(request, "university_portal/login.html", {})
@@ -318,6 +367,7 @@ def student_grade(request):
         return render(request, "university_portal/login.html", {})
     else:
         set_stu_grade(request.GET['grade_assign'], request.GET['stu_id'], request.GET['aid'])
+        grade_cal(request.GET['sid'], request.session['courseID'])
         return assignments(request)
 
 
