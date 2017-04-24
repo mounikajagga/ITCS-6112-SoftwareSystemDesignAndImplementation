@@ -6,6 +6,9 @@
 .navbar-brand{
     font-family: 'Satisfy', cursive;
 }
+body{
+    background: url(img/b25.png) repeat;
+}
 body > .container{
     padding-top: 60px;
 }

@@ -36,9 +36,22 @@
     <div class="row">
         <div class="col-sm-3"></div>
         <div class="col-sm-6">
-            <h2>Hi, {{ session.student.0 }}!</h2>
-            <h4>What are you up to today?</h4>
-            <br>
+            <div class="row">
+                <div class="col-sm-7">
+                    <h2>Hi, {{ session.student.0 }}!<br/>
+                        <small>{{ session.student.3 }}</small>
+                    </h2>
+                    <h4>What are you up to today?</h4>
+                    <br>
+
+                </div>
+                <div class="col-sm-5">
+                    <img src="static/img/profile.png" class="img-circle" alt="{{ names.1 }}" height="100" width="100"
+                         style="float: right;"/>
+                </div>
+            </div>
+
+
             <h5>Your Courses</h5>
 
             <table class="table">
@@ -58,7 +71,7 @@
                             </form>
                         </td>
                         <td>
-                        {{ value }}
+                            {{ value }}
                         </td>
                         <td>
                             {{ grades }}

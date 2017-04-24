@@ -6,7 +6,7 @@ from django.core.files.storage import FileSystemStorage
 # Database connection parameters
 
 USER = 'root'
-PASSWORD = 'Sulphur@1234'
+PASSWORD = 'admin'
 HOST = '127.0.0.1'
 DATABASE = 'ssdi_project'
 
@@ -285,7 +285,6 @@ def assignments_stu(request):
 
     if 'courseId' not in request.session:
         request.session['courseId'] = request.GET['courseId']
-        return render(request, "university_portal/student/welcome.html", {"session": request.session})
 
     all_assignments = get_all_posted_assignments(request.session['courseId'], request.session['student'][1])
     submitted_assignments = get_submitted_assignments(request.session['courseId'], request.session['student'][1])
