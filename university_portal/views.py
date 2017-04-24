@@ -6,7 +6,7 @@ from django.core.files.storage import FileSystemStorage
 # Database connection parameters
 
 USER = 'root'
-PASSWORD = 'admin'
+PASSWORD = 'Sulphur@1234'
 HOST = '127.0.0.1'
 DATABASE = 'ssdi_project'
 
@@ -233,17 +233,23 @@ def grade_cal(sid, courseID):
     rs = cur.fetchone()
     con.commit()"""
 
+    print(sid)
+    print(courseID)
     con1 = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur1 = con1.cursor()
-    statement1 = "SELECT grade FROM stu_submit WHERE sid=\'" \
-                + sid + "\' AND aid IN(SELECT aid FROM assignments WHERE cid=\'"+courseID+"\')"
+    statement1 = "SELECT grade FROM stu_submit WHERE sid=\'" + sid + "\'" \
+                 " AND grade is NOT NULL" \
+                 " AND aid IN (SELECT aid FROM assignments WHERE cid=\'"+courseID+"\')"
+
+    print(statement1)
     cur1.execute(statement1)
     rs1 = cur1.fetchall()
-    list_of_grades = list(rs1)
+    list_of_grades = rs1
     len1=len(list_of_grades)
+    print(list_of_grades)
     con1.commit()
-    grade=0
-    for g in list_of_grades:
+    grade = 0
+    for g in list_of_grades[0]:
         if g == 'A':
             grade = (grade + 4)
         elif g == 'B':
@@ -252,7 +258,8 @@ def grade_cal(sid, courseID):
             grade = (grade + 2)
         else:
             grade = (grade + 1)
-    avg= (grade / len1)
+    avg = (grade / len1)
+    print("Avg", avg)
     ovr_grade=''
     if avg>3.0:
         ovr_grade = 'A'
@@ -265,7 +272,7 @@ def grade_cal(sid, courseID):
     con2 = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur2 = con2.cursor()
     statement2 = "UPDATE enroll SET overall_grades=\'" + ovr_grade + "\' WHERE sid=\'" \
-                + sid + "\' AND cid=\'"+courseID+"\')"
+                + sid + "\' AND cid=\'"+courseID+"\'"
     cur2.execute(statement2)
     rs2 = cur2.fetchall()
     con2.commit()
@@ -322,7 +329,7 @@ def assignments(request):
 
         if 'CourseID' not in request.session:
             request.session['CourseID'] = request.GET['CourseID']
-
+        print("xx", request.session['CourseID'])
         all_course_assignments = get_all_course_assignments(request.session['CourseID'])
 
         faculty = get_faculty(request.session['username'])
@@ -366,8 +373,9 @@ def student_grade(request):
     if 'username' not in request.session:
         return render(request, "university_portal/login.html", {})
     else:
+        courseID = request.session['CourseID']
         set_stu_grade(request.GET['grade_assign'], request.GET['stu_id'], request.GET['aid'])
-        grade_cal(request.GET['sid'], request.session['courseID'])
+        grade_cal(request.GET['stu_id'], courseID)
         return assignments(request)
 
 
@@ -397,7 +405,7 @@ def get_student(username):
 def get_courses_stu(username):
     con = MySQLdb.connect(user=USER, password=PASSWORD, host=HOST, database=DATABASE)
     cur = con.cursor()
-    statement = "SELECT c.cid, c.cname FROM students s, enroll e, courses c WHERE s.sid=e.sid and e.cid=c.cid and s.email=\'" + username + "\'"
+    statement = "SELECT c.cid, c.cname, e.overall_grades FROM students s, enroll e, courses c WHERE s.sid=e.sid and e.cid=c.cid and s.email=\'" + username + "\'"
     cur.execute(statement)
     courselist = cur.fetchall()
     con.close()

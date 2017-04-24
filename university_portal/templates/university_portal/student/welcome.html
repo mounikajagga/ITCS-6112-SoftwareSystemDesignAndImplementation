@@ -46,10 +46,11 @@
                 <tr>
                     <th>Course ID</th>
                     <th>Course Name</th>
+                    <th>Grades</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for key, value in session.courses %}
+                {% for key, value, grades in session.courses %}
                     <tr>
                         <td>
                             <form action="/assignments_stu" method="GET">
@@ -57,7 +58,13 @@
                             </form>
                         </td>
                         <td>
-                        {{ value }}</tr>
+                        {{ value }}
+                        </td>
+                        <td>
+                            {{ grades }}
+                        </td>
+                    </tr>
+
                 {% endfor %}
                 </tbody>
             </table>
